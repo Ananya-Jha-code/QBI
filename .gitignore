@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Secrets / local env
+.env
+*.env
+!*.env.example
+
+# Generated data (downloaded figures, SQLite DB)
+western_blot_miner/data/
+
+# Claude Code / editor config
+.claude/
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
