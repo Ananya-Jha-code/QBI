@@ -66,29 +66,32 @@ export default function Home() {
         </div>
 
         {/* Vercel-inspired Search Bar - Responsive */}
-        <div style={{ maxWidth: '650px', margin: 'clamp(16px, 3vh, 32px) auto clamp(12px, 2vh, 24px)', width: '90vw' }}>
+        <div style={{ maxWidth: '750px', margin: 'clamp(16px, 3vh, 32px) auto clamp(12px, 2vh, 24px)', width: '92vw' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 'clamp(8px, 1vw, 12px)',
-              padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 2vw, 24px)',
-              background: 'rgba(255,255,255,.04)',
-              border: '1px solid rgba(255,255,255,.12)',
-              borderRadius: 'clamp(8px, 1vw, 12px)',
+              gap: 'clamp(12px, 1.5vw, 16px)',
+              padding: 'clamp(14px, 2.2vh, 20px) clamp(20px, 2.5vw, 32px)',
+              background: 'rgba(255,255,255,.12)',
+              border: '1.5px solid rgba(255,255,255,.25)',
+              borderRadius: 'clamp(12px, 1.5vw, 16px)',
               transition: 'all 0.3s ease',
-              backdropFilter: 'blur(8px)',
+              backdropFilter: 'blur(12px)',
+              boxShadow: '0 0 24px rgba(74,214,176,.2)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(74,214,176,.5)';
-              e.currentTarget.style.background = 'rgba(255,255,255,.06)';
+              e.currentTarget.style.borderColor = 'rgba(74,214,176,.8)';
+              e.currentTarget.style.background = 'rgba(255,255,255,.15)';
+              e.currentTarget.style.boxShadow = '0 0 32px rgba(74,214,176,.35)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,.12)';
-              e.currentTarget.style.background = 'rgba(255,255,255,.04)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,.25)';
+              e.currentTarget.style.background = 'rgba(255,255,255,.12)';
+              e.currentTarget.style.boxShadow = '0 0 24px rgba(74,214,176,.2)';
             }}
           >
-            <span style={{ fontSize: 'clamp(14px, 2vw, 18px)', opacity: 0.6 }}>🔍</span>
+            <span style={{ fontSize: 'clamp(16px, 2.2vw, 20px)', opacity: 0.8 }}>🔍</span>
             <input
               type="text"
               placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
@@ -99,7 +102,7 @@ export default function Home() {
                 background: 'transparent',
                 border: 'none',
                 color: '#e7f0ee',
-                fontSize: 'clamp(12px, 1.8vw, 16px)',
+                fontSize: 'clamp(14px, 2vw, 18px)',
                 fontFamily: "'Manrope', sans-serif",
                 outline: 'none',
               }}
@@ -113,21 +116,21 @@ export default function Home() {
               <button
                 onClick={() => setSearchQuery('')}
                 style={{
-                  background: 'rgba(74,214,176,.2)',
+                  background: 'rgba(74,214,176,.25)',
                   border: 'none',
-                  color: '#4ad6b0',
-                  borderRadius: '4px',
-                  padding: '4px 10px',
+                  color: '#e7f0ee',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
                   cursor: 'pointer',
-                  fontSize: '11px',
+                  fontSize: '12px',
                   fontWeight: 600,
                   transition: 'all 0.2s',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(74,214,176,.3)';
+                  e.currentTarget.style.background = 'rgba(74,214,176,.4)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(74,214,176,.2)';
+                  e.currentTarget.style.background = 'rgba(74,214,176,.25)';
                 }}
               >
                 Clear
@@ -144,12 +147,12 @@ export default function Home() {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: 'clamp(40px, 6vh, 56px)',
-              padding: '0 clamp(28px, 5vw, 48px)',
-              borderRadius: 'clamp(20px, 2vw, 28px)',
+              height: 'clamp(36px, 4.5vh, 48px)',
+              padding: '0 clamp(20px, 3.5vw, 36px)',
+              borderRadius: 'clamp(18px, 1.8vw, 24px)',
               background: '#4ad6b0',
               color: '#04130f',
-              fontSize: 'clamp(12px, 1.8vw, 16px)',
+              fontSize: 'clamp(11px, 1.5vw, 14px)',
               fontWeight: 700,
               fontFamily: '"IBM Plex Mono", monospace',
               letterSpacing: '0.5px',
