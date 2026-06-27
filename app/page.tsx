@@ -7,60 +7,69 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif" }}>
-      {/* HERO SECTION */}
-      <section style={{ textAlign: 'center', padding: '88px 56px 0', position: 'relative' }}>
-        <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '12.5px', letterSpacing: '5px', color: '#4ad6b0', marginBottom: '36px' }}>
+    <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif", display: 'flex', flexDirection: 'column' }}>
+      {/* HERO SECTION - FULL VIEWPORT FIT */}
+      <section style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 56px', position: 'relative', textAlign: 'center' }}>
+        <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', letterSpacing: '5px', color: '#4ad6b0', marginBottom: '24px' }}>
           PROTEIN&nbsp;DISCOVERY&nbsp;PLATFORM
         </div>
 
-        <div style={{ marginBottom: '30px', position: 'relative', display: 'inline-block' }}>
+        {/* Hero Text - Single Lines */}
+        <div style={{ marginBottom: '24px', maxWidth: '1200px' }}>
           <h1
             style={{
               fontFamily: '"Newsreader", serif',
               fontWeight: 400,
-              fontSize: '80px',
-              lineHeight: 0.97,
-              letterSpacing: '-2px',
-              margin: '0',
-              maxWidth: '900px',
-              position: 'relative',
+              fontSize: '56px',
+              lineHeight: 1.2,
+              letterSpacing: '-1.5px',
+              margin: '0 0 12px 0',
+              color: '#e7f0ee',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'clip',
             }}
           >
             <span
               style={{
                 textDecoration: 'line-through',
                 textDecorationColor: '#ff6b6b',
-                textDecorationThickness: '3px',
-                color: '#e7f0ee',
+                textDecorationThickness: '2px',
               }}
             >
               Manual review, buried evidence
             </span>
-            <br />
-            <em style={{ fontStyle: 'italic', color: '#e7f0ee', fontWeight: 400 }}>
-              Protein evidence, made searchable.
-            </em>
           </h1>
+          <h2
+            style={{
+              fontFamily: '"Newsreader", serif',
+              fontWeight: 400,
+              fontSize: '56px',
+              lineHeight: 1.2,
+              letterSpacing: '-1.5px',
+              margin: '0',
+              color: '#e7f0ee',
+              fontStyle: 'italic',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'clip',
+            }}
+          >
+            Protein evidence, made searchable.
+          </h2>
         </div>
 
         {/* Vercel-inspired Search Bar */}
-        <div
-          style={{
-            maxWidth: '700px',
-            margin: '50px auto 40px',
-            position: 'relative',
-          }}
-        >
+        <div style={{ maxWidth: '650px', margin: '24px auto 20px', width: '100%' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              padding: '14px 24px',
+              padding: '12px 20px',
               background: 'rgba(255,255,255,.04)',
               border: '1px solid rgba(255,255,255,.12)',
-              borderRadius: '12px',
+              borderRadius: '10px',
               transition: 'all 0.3s ease',
               backdropFilter: 'blur(8px)',
             }}
@@ -73,7 +82,7 @@ export default function Home() {
               e.currentTarget.style.background = 'rgba(255,255,255,.04)';
             }}
           >
-            <span style={{ fontSize: '18px', opacity: 0.6 }}>🔍</span>
+            <span style={{ fontSize: '16px', opacity: 0.6 }}>🔍</span>
             <input
               type="text"
               placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
@@ -84,7 +93,7 @@ export default function Home() {
                 background: 'transparent',
                 border: 'none',
                 color: '#e7f0ee',
-                fontSize: '16px',
+                fontSize: '14px',
                 fontFamily: "'Manrope', sans-serif",
                 outline: 'none',
               }}
@@ -101,10 +110,10 @@ export default function Home() {
                   background: 'rgba(74,214,176,.2)',
                   border: 'none',
                   color: '#4ad6b0',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  padding: '4px 10px',
                   cursor: 'pointer',
-                  fontSize: '12px',
+                  fontSize: '11px',
                   fontWeight: 600,
                   transition: 'all 0.2s',
                 }}
@@ -129,35 +138,36 @@ export default function Home() {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: '56px',
-              padding: '0 48px',
-              borderRadius: '30px',
+              height: '48px',
+              padding: '0 40px',
+              borderRadius: '24px',
               background: '#4ad6b0',
               color: '#04130f',
-              fontSize: '16px',
+              fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
               transition: 'all 0.3s',
+              marginTop: '12px',
             }}
           >
             UCSF QBI 2026 Demo
           </div>
         </Link>
-      </section>
 
-      {/* STATS SECTION */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '80px', padding: '120px 56px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,.07)' }}>
-        <div>
-          <div style={{ fontSize: '48px', fontWeight: 700, color: '#4ad6b0', marginBottom: '12px' }}>12.4K+</div>
-          <div style={{ fontSize: '14px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '1px' }}>BLOTS EXTRACTED</div>
-        </div>
-        <div>
-          <div style={{ fontSize: '48px', fontWeight: 700, color: '#e0a458', marginBottom: '12px' }}>2800+</div>
-          <div style={{ fontSize: '14px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '1px' }}>PAPERS INDEXED</div>
-        </div>
-        <div>
-          <div style={{ fontSize: '48px', fontWeight: 700, color: '#8fb6ff', marginBottom: '12px' }}>520+</div>
-          <div style={{ fontSize: '14px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '1px' }}>UNIQUE PROTEINS</div>
+        {/* STATS SECTION - COMPACT, IN-VIEW */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '60px', marginTop: '40px', width: '100%', maxWidth: '900px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '36px', fontWeight: 700, color: '#4ad6b0', marginBottom: '6px' }}>12.4K+</div>
+            <div style={{ fontSize: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '0.8px' }}>BLOTS EXTRACTED</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '36px', fontWeight: 700, color: '#e0a458', marginBottom: '6px' }}>2800+</div>
+            <div style={{ fontSize: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '0.8px' }}>PAPERS INDEXED</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '36px', fontWeight: 700, color: '#8fb6ff', marginBottom: '6px' }}>520+</div>
+            <div style={{ fontSize: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '0.8px' }}>UNIQUE PROTEINS</div>
+          </div>
         </div>
       </section>
     </div>
