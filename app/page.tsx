@@ -10,20 +10,20 @@ export default function Home() {
     <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif", display: 'flex', flexDirection: 'column' }}>
       {/* HERO SECTION - FULL VIEWPORT FIT */}
       <section style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 56px', position: 'relative', textAlign: 'center' }}>
-        <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', letterSpacing: '5px', color: '#4ad6b0', marginBottom: '24px' }}>
+        <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 'clamp(9px, 1.5vw, 13px)', letterSpacing: 'clamp(3px, 0.5vw, 5px)', color: '#4ad6b0', marginBottom: 'clamp(16px, 3vh, 32px)' }}>
           PROTEIN&nbsp;DISCOVERY&nbsp;PLATFORM
         </div>
 
-        {/* Hero Text - Single Lines */}
-        <div style={{ marginBottom: '24px', maxWidth: '1200px' }}>
+        {/* Hero Text - Single Lines - Responsive */}
+        <div style={{ marginBottom: 'clamp(16px, 4vh, 32px)', maxWidth: '95vw' }}>
           <h1
             style={{
               fontFamily: '"Newsreader", serif',
               fontWeight: 400,
-              fontSize: '56px',
+              fontSize: 'clamp(28px, 7vw, 72px)',
               lineHeight: 1.2,
               letterSpacing: '-1.5px',
-              margin: '0 0 12px 0',
+              margin: '0 0 clamp(6px, 1.5vh, 16px) 0',
               color: '#e7f0ee',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -44,7 +44,7 @@ export default function Home() {
             style={{
               fontFamily: '"Newsreader", serif',
               fontWeight: 400,
-              fontSize: '56px',
+              fontSize: 'clamp(28px, 7vw, 72px)',
               lineHeight: 1.2,
               letterSpacing: '-1.5px',
               margin: '0',
@@ -59,17 +59,17 @@ export default function Home() {
           </h2>
         </div>
 
-        {/* Vercel-inspired Search Bar */}
-        <div style={{ maxWidth: '650px', margin: '24px auto 20px', width: '100%' }}>
+        {/* Vercel-inspired Search Bar - Responsive */}
+        <div style={{ maxWidth: '650px', margin: 'clamp(16px, 3vh, 32px) auto clamp(12px, 2vh, 24px)', width: '90vw' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              padding: '12px 20px',
+              gap: 'clamp(8px, 1vw, 12px)',
+              padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 2vw, 24px)',
               background: 'rgba(255,255,255,.04)',
               border: '1px solid rgba(255,255,255,.12)',
-              borderRadius: '10px',
+              borderRadius: 'clamp(8px, 1vw, 12px)',
               transition: 'all 0.3s ease',
               backdropFilter: 'blur(8px)',
             }}
@@ -82,7 +82,7 @@ export default function Home() {
               e.currentTarget.style.background = 'rgba(255,255,255,.04)';
             }}
           >
-            <span style={{ fontSize: '16px', opacity: 0.6 }}>🔍</span>
+            <span style={{ fontSize: 'clamp(14px, 2vw, 18px)', opacity: 0.6 }}>🔍</span>
             <input
               type="text"
               placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
@@ -93,7 +93,7 @@ export default function Home() {
                 background: 'transparent',
                 border: 'none',
                 color: '#e7f0ee',
-                fontSize: '14px',
+                fontSize: 'clamp(12px, 1.8vw, 16px)',
                 fontFamily: "'Manrope', sans-serif",
                 outline: 'none',
               }}
@@ -130,7 +130,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA Button - Responsive */}
         <Link href="/search">
           <div
             className="vt-teal"
@@ -138,35 +138,35 @@ export default function Home() {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              height: '48px',
-              padding: '0 40px',
-              borderRadius: '24px',
+              height: 'clamp(40px, 6vh, 56px)',
+              padding: '0 clamp(28px, 5vw, 48px)',
+              borderRadius: 'clamp(20px, 2vw, 28px)',
               background: '#4ad6b0',
               color: '#04130f',
-              fontSize: '14px',
+              fontSize: 'clamp(12px, 1.8vw, 16px)',
               fontWeight: 700,
               cursor: 'pointer',
               transition: 'all 0.3s',
-              marginTop: '12px',
+              marginTop: 'clamp(8px, 1.5vh, 16px)',
             }}
           >
             UCSF QBI 2026 Demo
           </div>
         </Link>
 
-        {/* STATS SECTION - COMPACT, IN-VIEW */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '60px', marginTop: '40px', width: '100%', maxWidth: '900px' }}>
+        {/* STATS SECTION - COMPACT, IN-VIEW - Responsive */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 700, color: '#4ad6b0', marginBottom: '6px' }}>12.4K+</div>
-            <div style={{ fontSize: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '0.8px' }}>BLOTS EXTRACTED</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)' }}>12.4K+</div>
+            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>BLOTS EXTRACTED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 700, color: '#e0a458', marginBottom: '6px' }}>2800+</div>
-            <div style={{ fontSize: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '0.8px' }}>PAPERS INDEXED</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)' }}>2800+</div>
+            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PAPERS INDEXED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 700, color: '#8fb6ff', marginBottom: '6px' }}>520+</div>
-            <div style={{ fontSize: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '0.8px' }}>UNIQUE PROTEINS</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#8fb6ff', marginBottom: 'clamp(4px, 1vh, 8px)' }}>520+</div>
+            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
           </div>
         </div>
       </section>
