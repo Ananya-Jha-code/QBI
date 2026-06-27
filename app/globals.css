@@ -44,6 +44,8 @@ body {
   color: var(--color-text-muted);
   transition: color 0.18s;
   cursor: pointer;
+  border-bottom: 2px solid #a78bfa;
+  padding-bottom: 2px;
 }
 
 .vt-navlink:hover {

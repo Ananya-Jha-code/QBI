@@ -40,7 +40,7 @@ export default function Home() {
               style={{
                 textDecoration: 'line-through',
                 textDecorationColor: '#ff6b6b',
-                textDecorationThickness: '2px',
+                textDecorationThickness: '3px',
               }}
             >
               Manual review, buried evidence
@@ -151,6 +151,8 @@ export default function Home() {
               color: '#04130f',
               fontSize: 'clamp(12px, 1.8vw, 16px)',
               fontWeight: 700,
+              fontFamily: '"IBM Plex Mono", monospace',
+              letterSpacing: '0.5px',
               cursor: 'pointer',
               transition: 'all 0.3s',
               marginTop: 'clamp(8px, 1.5vh, 16px)',
@@ -171,7 +173,7 @@ export default function Home() {
             <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PAPERS INDEXED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#8fb6ff', marginBottom: 'clamp(4px, 1vh, 8px)' }}>520+</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)' }}>520+</div>
             <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
           </div>
         </div>
