@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,12..72,400;0,12..72,500;1,12..72,400;1,12..72,500;1,12..72,600&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,12..72,400;0,12..72,500;1,12..72,400;1,12..72,500;1,12..72,600&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
   --color-bg: #06090c;
@@ -44,6 +44,8 @@ body {
   color: var(--color-text-muted);
   transition: color 0.18s;
   cursor: pointer;
+  border-bottom: 2px solid #a78bfa;
+  padding-bottom: 2px;
 }
 
 .vt-navlink:hover {
