@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif" }}>
       {/* HERO SECTION */}
@@ -10,61 +13,136 @@ export default function Home() {
         <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '12.5px', letterSpacing: '5px', color: '#4ad6b0', marginBottom: '36px' }}>
           PROTEIN&nbsp;DISCOVERY&nbsp;PLATFORM
         </div>
-        <h1
+
+        <div style={{ marginBottom: '30px', position: 'relative', display: 'inline-block' }}>
+          <h1
+            style={{
+              fontFamily: '"Newsreader", serif',
+              fontWeight: 400,
+              fontSize: '80px',
+              lineHeight: 0.97,
+              letterSpacing: '-2px',
+              margin: '0',
+              maxWidth: '900px',
+              position: 'relative',
+            }}
+          >
+            <span
+              style={{
+                textDecoration: 'line-through',
+                textDecorationColor: '#ff6b6b',
+                textDecorationThickness: '3px',
+                color: '#e7f0ee',
+              }}
+            >
+              Manual review, buried evidence
+            </span>
+            <br />
+            <em style={{ fontStyle: 'italic', color: '#e7f0ee', fontWeight: 400 }}>
+              Protein evidence, made searchable.
+            </em>
+          </h1>
+        </div>
+
+        {/* Vercel-inspired Search Bar */}
+        <div
           style={{
-            fontFamily: '"Newsreader", serif',
-            fontWeight: 400,
-            fontSize: '80px',
-            lineHeight: 0.97,
-            letterSpacing: '-2px',
-            margin: '0 auto 30px',
-            maxWidth: '900px',
+            maxWidth: '700px',
+            margin: '50px auto 40px',
+            position: 'relative',
           }}
         >
-          Mine the blots.<br />
-          <em>Extract the truth.</em>
-        </h1>
-        <p style={{ fontSize: '19px', lineHeight: 1.65, color: '#a9bdb5', maxWidth: '620px', margin: '0 auto 40px', fontWeight: 500 }}>
-          HiveBlot aggregates thousands of published western blot results into a searchable database. Discover protein expression patterns in seconds.
-        </p>
-        <div style={{ display: 'flex', gap: '14px', justifyContent: 'center' }}>
-          <Link href="/search">
-            <div
-              className="vt-teal"
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '14px 24px',
+              background: 'rgba(255,255,255,.04)',
+              border: '1px solid rgba(255,255,255,.12)',
+              borderRadius: '12px',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(8px)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(74,214,176,.5)';
+              e.currentTarget.style.background = 'rgba(255,255,255,.06)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,.12)';
+              e.currentTarget.style.background = 'rgba(255,255,255,.04)';
+            }}
+          >
+            <span style={{ fontSize: '18px', opacity: 0.6 }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '56px',
-                padding: '0 32px',
-                borderRadius: '30px',
-                background: '#4ad6b0',
-                color: '#04130f',
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: '#e7f0ee',
                 fontSize: '16px',
-                fontWeight: 700,
+                fontFamily: "'Manrope', sans-serif",
+                outline: 'none',
               }}
-            >
-              Launch search
-            </div>
-          </Link>
-          <Link href="/search?quick=true">
-            <div
-              className="vt-ghost"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '56px',
-                padding: '0 32px',
-                borderRadius: '30px',
-                border: '1px solid rgba(255,255,255,.22)',
-                color: '#a9bdb5',
-                fontSize: '16px',
-                fontWeight: 600,
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+                }
               }}
-            >
-              Quick preview
-            </div>
-          </Link>
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  background: 'rgba(74,214,176,.2)',
+                  border: 'none',
+                  color: '#4ad6b0',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(74,214,176,.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(74,214,176,.2)';
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* CTA Button */}
+        <Link href="/search">
+          <div
+            className="vt-teal"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '56px',
+              padding: '0 48px',
+              borderRadius: '30px',
+              background: '#4ad6b0',
+              color: '#04130f',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+            }}
+          >
+            UCSF QBI 2026 Demo
+          </div>
+        </Link>
       </section>
 
       {/* STATS SECTION */}
@@ -80,36 +158,6 @@ export default function Home() {
         <div>
           <div style={{ fontSize: '48px', fontWeight: 700, color: '#8fb6ff', marginBottom: '12px' }}>520+</div>
           <div style={{ fontSize: '14px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '1px' }}>UNIQUE PROTEINS</div>
-        </div>
-      </section>
-
-      {/* FEATURES SECTION */}
-      <section style={{ padding: '120px 56px', borderTop: '1px solid rgba(255,255,255,.07)' }}>
-        <h2 style={{ fontSize: '48px', fontWeight: 600, textAlign: 'center', marginBottom: '80px' }}>
-          How HiveBlot works
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '60px', maxWidth: '1200px', margin: '0 auto' }}>
-          <div>
-            <div style={{ fontSize: '32px', marginBottom: '16px' }}>🔍</div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Search</h3>
-            <p style={{ color: '#a9bdb5', lineHeight: 1.6, fontSize: '15px' }}>
-              Type any protein name and instantly access all published western blot results for that protein.
-            </p>
-          </div>
-          <div>
-            <div style={{ fontSize: '32px', marginBottom: '16px' }}>📊</div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Discover</h3>
-            <p style={{ color: '#a9bdb5', lineHeight: 1.6, fontSize: '15px' }}>
-              See which cell lines express your protein, how conditions affect expression, and what researchers used.
-            </p>
-          </div>
-          <div>
-            <div style={{ fontSize: '32px', marginBottom: '16px' }}>🔗</div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Link</h3>
-            <p style={{ color: '#a9bdb5', lineHeight: 1.6, fontSize: '15px' }}>
-              Every result links directly to the source paper on PubMed. Trace findings back to the original research.
-            </p>
-          </div>
         </div>
       </section>
     </div>

@@ -21,14 +21,26 @@ export function Navigation() {
       {/* Logo */}
       <Link href="/">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-          <svg viewBox="0 0 32 32" style={{ width: '28px', height: '28px' }} xmlns="http://www.w3.org/2000/svg">
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: '2px solid rgba(255,255,255,.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg viewBox="0 0 32 32" style={{ width: '24px', height: '24px' }} xmlns="http://www.w3.org/2000/svg">
             <g stroke="#4ad6b0" strokeWidth="1.2" fill="none">
               <path d="M 8 8 L 12 5 L 16 8 L 16 14 L 12 17 L 8 14 Z" />
               <path d="M 12 14 L 16 11 L 20 14 L 20 20 L 16 23 L 12 20 Z" />
               <path d="M 16 20 L 20 17 L 24 20 L 24 26 L 20 29 L 16 26 Z" />
             </g>
             <circle cx="16" cy="16" r="1.5" fill="#4ad6b0" opacity="0.6" />
-          </svg>
+            </svg>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
             <span
               style={{
@@ -70,45 +82,6 @@ export function Navigation() {
         </Link>
       </div>
 
-      {/* Buttons */}
-      <div style={{ display: 'flex', gap: '10px' }}>
-        <Link href="/search?quick=true">
-          <div
-            className="vt-ghost"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: '42px',
-              padding: '0 20px',
-              borderRadius: '30px',
-              border: '1px solid rgba(255,255,255,.22)',
-              color: '#a9bdb5',
-              fontSize: '13.5px',
-              fontWeight: 600,
-            }}
-          >
-            Quick preview
-          </div>
-        </Link>
-        <Link href="/search">
-          <div
-            className="vt-teal"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: '42px',
-              padding: '0 22px',
-              borderRadius: '30px',
-              background: '#4ad6b0',
-              color: '#04130f',
-              fontSize: '13.5px',
-              fontWeight: 700,
-            }}
-          >
-            Launch search
-          </div>
-        </Link>
-      </div>
     </nav>
   );
 }
