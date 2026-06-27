@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/about/page": "/about",
+  "/diseases/[id]/page": "/diseases/[id]",
+  "/diseases/page": "/diseases",
+  "/favicon.ico/route": "/favicon.ico",
+  "/learn/page": "/learn",
+  "/molecules/[id]/page": "/molecules/[id]",
+  "/molecules/page": "/molecules",
+  "/oracle/page": "/oracle",
+  "/page": "/",
+  "/receptors/[id]/page": "/receptors/[id]",
+  "/receptors/page": "/receptors",
+  "/search/page": "/search"
+}
