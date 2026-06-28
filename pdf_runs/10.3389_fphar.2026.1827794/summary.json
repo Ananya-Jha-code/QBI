@@ -1,0 +1,15 @@
+{
+  "paper_id": "10.3389/fphar.2026.1827794",
+  "extracted_doi": "10.3389/fphar.2026.1827794",
+  "pdf_path": "papers/fphar-17-1827794.pdf",
+  "out_dir": "pdf_runs/10.3389_fphar.2026.1827794",
+  "dpi": 350,
+  "pages": 5,
+  "candidate_count": 0,
+  "llm_candidate_count": 0,
+  "contexts_written": 0,
+  "page_dir": "pdf_runs/10.3389_fphar.2026.1827794/rendered_pages",
+  "candidate_dir": "pdf_runs/10.3389_fphar.2026.1827794/panel_candidates",
+  "contexts_path": "pdf_runs/10.3389_fphar.2026.1827794/candidate_contexts.jsonl",
+  "top_candidates": []
+}

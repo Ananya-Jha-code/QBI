@@ -1,116 +1,116 @@
-"""End-to-end ingestion pipeline.
-
-    PMC search  ->  BioC full text  ->  caption pre-filter  ->  Claude extract  ->  SQLite
+"""End-to-end local PDF pipeline.
 
 Run it:
-    python -m western_blot_miner.pipeline --protein TP53 --limit 30
-    python -m western_blot_miner.pipeline --protein GAPDH --limit 50 --with-images
+    python -m western_blot_miner.pipeline papers/example.pdf
 """
 import argparse
-import time
+import json
+import os
 from pathlib import Path
-from typing import Optional
 
-from . import config, db, extract, images, pmc
+from . import env, pdf_preprocess, supabase_loader, vlm_extract
 
 
-def ingest_protein(
-    protein: str,
-    limit: int = 30,
-    with_images: bool = False,
-    polite_delay: float = 0.4,
-) -> dict:
-    """Search PMC for a protein, extract western blot records, store them."""
-    db.init_db()
-    pmcids = pmc.search_pmc(protein, limit=limit)
-    print(f"Found {len(pmcids)} open-access PMC articles for '{protein}'.")
-
-    totals = {"articles": 0, "figures_seen": 0, "figures_extracted": 0, "records": 0}
-
-    for i, pmcid in enumerate(pmcids, 1):
-        print(f"[{i}/{len(pmcids)}] {pmcid}")
-        article = pmc.fetch_article(pmcid)
-        if article is None:
-            print("    (no BioC document; skipping)")
-            continue
-        totals["articles"] += 1
-
-        # Pre-filter to western-blot-looking figures to save LLM calls.
-        candidates = [f for f in article.figures if pmc.is_western_blot_caption(f.caption)]
-        if not candidates:
-            continue
-
-        image_map: dict[str, Path] = {}
-        if with_images:
-            image_map = images.download_figures(pmcid)
-
-        for fig in candidates:
-            totals["figures_seen"] += 1
-            if db.figure_already_processed(pmcid, fig.figure_id):
-                continue
-
-            image_path: Optional[Path] = None
-            if with_images:
-                image_path = images.resolve_image(fig, image_map)
-
-            extraction = extract.extract_figure(
-                caption=fig.caption,
-                methods=article.methods,
-                image_path=image_path,
-            )
-            db.mark_figure_processed(pmcid, fig.figure_id)
-
-            if extraction is None or not extraction.is_western_blot:
-                continue
-            totals["figures_extracted"] += 1
-
-            rows = []
-            for rec in extraction.records:
-                rows.append(
-                    {
-                        "protein": rec.protein,
-                        "protein_norm": rec.protein.upper(),
-                        "cell_line": rec.cell_line,
-                        "organism": rec.organism,
-                        "mol_weight_kda": rec.mol_weight_kda,
-                        "antibody": rec.antibody,
-                        "condition": rec.condition,
-                        "result": rec.result,
-                        "pmid": article.pmid,
-                        "pmcid": pmcid,
-                        "doi": article.doi,
-                        "figure_id": fig.figure_id,
-                        "figure_caption": fig.caption[:2000],
-                        "image_path": str(image_path) if image_path else None,
-                        "confidence": extraction.confidence,
-                    }
-                )
-            inserted = db.insert_records(rows)
-            totals["records"] += inserted
-            print(f"    {fig.figure_id}: +{inserted} records "
-                  f"(conf {extraction.confidence:.2f})")
-
-        time.sleep(polite_delay)  # be kind to NCBI
-
-    print(
-        f"\nDone. Articles: {totals['articles']}, "
-        f"WB figures extracted: {totals['figures_extracted']}, "
-        f"records stored: {totals['records']}."
+def run_pdf_pipeline(pdf_path: str | Path) -> dict:
+    """Preprocess a PDF, run the configured VLM, and stream positives to Supabase."""
+    pdf_path = Path(pdf_path)
+    summary = pdf_preprocess.preprocess_pdf(
+        pdf_path=pdf_path,
+        paper_id=None,
+        out_dir=None,
+        dpi=_env_int("WBM_PDF_DPI", pdf_preprocess.DEFAULT_DPI),
+        min_candidate_score=_env_float(
+            "WBM_MIN_CANDIDATE_SCORE",
+            pdf_preprocess.DEFAULT_MIN_CANDIDATE_SCORE,
+        ),
+        min_llm_score=_env_float("WBM_MIN_LLM_SCORE", pdf_preprocess.DEFAULT_MIN_LLM_SCORE),
     )
-    return totals
+    print(
+        f"Rendered {summary['pages']} pages; "
+        f"{summary['candidate_count']} candidates after CV filtering; "
+        f"{summary['llm_candidate_count']} candidates above VLM threshold."
+    )
+    print(f"Paper ID: {summary['paper_id']}")
+    print(f"Output: {summary['out_dir']}")
+
+    supabase_stream_path = Path(summary["out_dir"]) / "supabase_rows_streamed.jsonl"
+
+    def upload_positive(record: dict) -> int:
+        rows = supabase_loader.flatten_json([record])
+        if not rows:
+            return 0
+        with supabase_stream_path.open("a", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row) + "\n")
+        uploaded = supabase_loader.upload_rows(
+            rows,
+            table_name=os.environ.get("SUPABASE_TABLE", supabase_loader.DEFAULT_TABLE_NAME),
+            idempotent=_env_bool("SUPABASE_IDEMPOTENT", True),
+        )
+        print(
+            f"Supabase upload: {uploaded} rows from {record['candidate_path']}",
+            flush=True,
+        )
+        return uploaded
+
+    vlm_summary = vlm_extract.run_vlm_extraction(
+        run_dir=summary["out_dir"],
+        model=os.environ.get("WBM_VLM_MODEL", vlm_extract.DEFAULT_VLM_MODEL),
+        max_tokens=_env_int("WBM_VLM_MAX_TOKENS", vlm_extract.DEFAULT_MAX_TOKENS),
+        timeout=_env_int("WBM_VLM_TIMEOUT", vlm_extract.DEFAULT_TIMEOUT),
+        resume=True,
+        on_positive=upload_positive,
+    )
+    print(
+        f"VLM results: {vlm_summary['results']} records; "
+        f"{vlm_summary['positive_results']} western blot positives."
+    )
+    print(
+        "Supabase streamed during VLM extraction: "
+        f"{vlm_summary['streamed_positive_rows']} rows"
+    )
+
+    flattened_path = Path(summary["out_dir"]) / "supabase_rows.json"
+    supabase_summary = supabase_loader.convert_and_upload(
+        json_path=vlm_summary["positives_json"],
+        output_path=flattened_path,
+        upload=False,
+    )
+    print(f"Supabase rows: {supabase_summary['rows']} written to {flattened_path}")
+
+    return {
+        "preprocess": summary,
+        "vlm": vlm_summary,
+        "supabase": supabase_summary,
+    }
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Mine western blot data from PMC.")
-    ap.add_argument("--protein", required=True, help="Protein name, e.g. TP53")
-    ap.add_argument("--limit", type=int, default=30, help="Max PMC articles to scan")
-    ap.add_argument(
-        "--with-images",
-        action="store_true",
-        help="Also download figure images and send them to the vision model",
+    env.load_env()
+
+    ap = argparse.ArgumentParser(
+        description="Extract western blot data from a PDF and write positives to Supabase."
     )
+    ap.add_argument("pdf", type=Path, help="Path to the paper PDF")
     args = ap.parse_args()
-    ingest_protein(args.protein, limit=args.limit, with_images=args.with_images)
+    run_pdf_pipeline(args.pdf)
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _env_int(name: str, default: int) -> int:
+    value = os.environ.get(name)
+    return int(value) if value else default
+
+
+def _env_float(name: str, default: float) -> float:
+    value = os.environ.get(name)
+    return float(value) if value else default
 
 
 if __name__ == "__main__":

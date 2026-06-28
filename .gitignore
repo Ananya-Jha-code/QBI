@@ -13,6 +13,7 @@ env/
 
 # Generated data (downloaded figures, SQLite DB)
 western_blot_miner/data/
+pdf_runs/
 
 # Claude Code / editor config
 .claude/
