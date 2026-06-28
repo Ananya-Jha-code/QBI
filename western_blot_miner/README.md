@@ -64,6 +64,12 @@ Put PDFs under `papers/`, then run the pipeline with the PDF path:
 python -m western_blot_miner.pipeline papers/fphar-17-1827794.pdf
 ```
 
+To force a fresh VLM pass instead of reusing cached extraction JSONL:
+
+```bash
+python -m western_blot_miner.pipeline papers/fphar-17-1827794.pdf --no-cache
+```
+
 That command does the full flow:
 
 1. Extract the paper DOI and use it as `paper_id`

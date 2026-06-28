@@ -11,7 +11,7 @@ from pathlib import Path
 from . import env, pdf_preprocess, supabase_loader, vlm_extract
 
 
-def run_pdf_pipeline(pdf_path: str | Path) -> dict:
+def run_pdf_pipeline(pdf_path: str | Path, use_cache: bool = True) -> dict:
     """Preprocess a PDF, run the configured VLM, and stream positives to Supabase."""
     pdf_path = Path(pdf_path)
     summary = pdf_preprocess.preprocess_pdf(
@@ -32,8 +32,21 @@ def run_pdf_pipeline(pdf_path: str | Path) -> dict:
     )
     print(f"Paper ID: {summary['paper_id']}")
     print(f"Output: {summary['out_dir']}")
+    if use_cache:
+        print(
+            "VLM resume is enabled: cached successful extractions are reused; "
+            "only missing or failed candidates query the VLM.",
+            flush=True,
+        )
+    else:
+        print(
+            "VLM cache is disabled: every candidate above threshold will query the VLM.",
+            flush=True,
+        )
 
     supabase_stream_path = Path(summary["out_dir"]) / "supabase_rows_streamed.jsonl"
+    if not use_cache and supabase_stream_path.exists():
+        supabase_stream_path.write_text("", encoding="utf-8")
 
     def upload_positive(record: dict) -> int:
         rows = supabase_loader.flatten_json([record])
@@ -59,7 +72,7 @@ def run_pdf_pipeline(pdf_path: str | Path) -> dict:
         max_tokens=_env_int("WBM_VLM_MAX_TOKENS", vlm_extract.DEFAULT_MAX_TOKENS),
         timeout=_env_int("WBM_VLM_TIMEOUT", vlm_extract.DEFAULT_TIMEOUT),
         image_max_side=_env_int("WBM_VLM_IMAGE_MAX_SIDE", vlm_extract.DEFAULT_IMAGE_MAX_SIDE),
-        resume=True,
+        resume=use_cache,
         on_positive=upload_positive,
     )
     print(
@@ -67,9 +80,20 @@ def run_pdf_pipeline(pdf_path: str | Path) -> dict:
         f"{vlm_summary['positive_results']} western blot positives."
     )
     print(
+        "VLM work this run: "
+        f"{vlm_summary['cached_results']} cached, "
+        f"{vlm_summary['queried_candidates']} queried."
+    )
+    print(
         "Supabase streamed during VLM extraction: "
         f"{vlm_summary['streamed_positive_rows']} rows"
     )
+    if use_cache and vlm_summary["queried_candidates"] == 0:
+        print(
+            "Supabase streaming skipped: all VLM results came from cache, "
+            "so no new positive-candidate upload callbacks ran.",
+            flush=True,
+        )
 
     flattened_path = Path(summary["out_dir"]) / "supabase_rows.json"
     supabase_summary = supabase_loader.convert_and_upload(
@@ -77,7 +101,10 @@ def run_pdf_pipeline(pdf_path: str | Path) -> dict:
         output_path=flattened_path,
         upload=False,
     )
-    print(f"Supabase rows: {supabase_summary['rows']} written to {flattened_path}")
+    print(
+        f"Supabase rows: {supabase_summary['rows']} written locally to {flattened_path} "
+        "(not uploaded in this final conversion step)."
+    )
 
     return {
         "preprocess": summary,
@@ -93,8 +120,13 @@ def main() -> None:
         description="Extract western blot data from a PDF and write positives to Supabase."
     )
     ap.add_argument("pdf", type=Path, help="Path to the paper PDF")
+    ap.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="Ignore cached VLM extraction JSONL and rerun every VLM candidate.",
+    )
     args = ap.parse_args()
-    run_pdf_pipeline(args.pdf)
+    run_pdf_pipeline(args.pdf, use_cache=not args.no_cache)
 
 
 def _env_bool(name: str, default: bool) -> bool:

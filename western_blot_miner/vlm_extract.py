@@ -269,6 +269,7 @@ def run_vlm_extraction(
 
     done_paths = set()
     results = []
+    cached_results = 0
     if resume and output_jsonl.exists():
         existing_by_path = {}
         with output_jsonl.open(encoding="utf-8") as handle:
@@ -287,6 +288,32 @@ def run_vlm_extraction(
                 continue
             results.append(record)
             done_paths.add(record["candidate_path"])
+            cached_results += 1
+
+        to_query = len(candidates) - len(done_paths)
+        print(
+            "VLM resume cache: "
+            f"{cached_results}/{len(candidates)} candidates already have successful cached results; "
+            f"{to_query} will query the VLM.",
+            flush=True,
+        )
+        if to_query == 0:
+            print(
+                "VLM resume cache: no VLM requests needed for this run.",
+                flush=True,
+            )
+    elif resume:
+        print(
+            "VLM resume cache: no existing extraction stream found; "
+            f"{len(candidates)} will query the VLM.",
+            flush=True,
+        )
+    else:
+        print(
+            "VLM cache disabled: "
+            f"{len(candidates)} candidates will query the VLM.",
+            flush=True,
+        )
 
     extractor = OpenAICompatibleVLM(
         base_url=base_url,
@@ -320,17 +347,20 @@ def run_vlm_extraction(
 
     output_mode = "a" if resume else "w"
     streamed_positive_rows = 0
+    queried_candidates = 0
     with output_jsonl.open(output_mode, encoding="utf-8") as handle:
         for idx, candidate in enumerate(candidates, 1):
             candidate_path = candidate["candidate_path"]
             if candidate_path in done_paths:
                 continue
+            queried_candidates += 1
             context = contexts.get(candidate_path, "")
             print(
                 f"{idx}/{len(candidates)} "
                 f"score={candidate['cv_score']:.3f} "
                 f"page={candidate['page']} "
-                f"{candidate_path}"
+                f"{candidate_path}",
+                flush=True,
             )
             try:
                 extraction = _extract_with_split_fallback(
@@ -373,6 +403,8 @@ def run_vlm_extraction(
         "candidates": len(candidates),
         "results": len(results),
         "positive_results": len(positives),
+        "cached_results": cached_results,
+        "queried_candidates": queried_candidates,
         "streamed_positive_rows": streamed_positive_rows,
         "output_jsonl": str(output_jsonl),
         "output_json": str(output_json),
