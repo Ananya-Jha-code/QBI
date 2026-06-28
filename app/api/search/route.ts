@@ -13,24 +13,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call the backend API
+    console.log('Calling backend at:', BACKEND_URL);
+    console.log('Query:', query);
+
+    // Call the backend API directly
     const backendResponse = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ query }),
+      timeout: 30000,
     });
 
     if (!backendResponse.ok) {
-      console.error('Backend error:', backendResponse.status, backendResponse.statusText);
+      const errorText = await backendResponse.text();
+      console.error('Backend error:', backendResponse.status, errorText);
       return NextResponse.json(
-        { error: 'Backend search failed' },
+        { error: `Backend returned ${backendResponse.status}: ${errorText}` },
         { status: backendResponse.status }
       );
     }
 
     const data = await backendResponse.json();
+    console.log('Backend response:', data);
     return NextResponse.json(data);
   } catch (error) {
     console.error('Search API error:', error);

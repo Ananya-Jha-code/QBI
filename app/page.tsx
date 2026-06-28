@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { SearchInput } from '@/components/SearchInput';
-import DatabaseResultCard from '@/components/DatabaseResultCard';
+import ResultsTable from '@/components/ResultsTable';
 
 interface DatabaseResult {
   id: number;
@@ -248,11 +248,7 @@ export default function Home() {
 
           {error && <div style={{ color: '#ff6b6b', marginBottom: '20px' }}>Error: {error}</div>}
 
-          {!loading && results.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {results.map((result) => <DatabaseResultCard key={result.id} data={result} />)}
-            </div>
-          )}
+          {!loading && results.length > 0 && <ResultsTable results={results} />}
 
           {!loading && results.length === 0 && !error && (
             <div style={{ textAlign: 'center', color: '#a9bdb5', padding: '40px' }}>

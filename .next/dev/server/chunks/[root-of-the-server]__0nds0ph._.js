@@ -61,7 +61,9 @@ async function POST(request) {
                 status: 400
             });
         }
-        // Call the backend API
+        console.log('Calling backend at:', BACKEND_URL);
+        console.log('Query:', query);
+        // Call the backend API directly
         const backendResponse = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: {
@@ -69,17 +71,20 @@ async function POST(request) {
             },
             body: JSON.stringify({
                 query
-            })
+            }),
+            timeout: 30000
         });
         if (!backendResponse.ok) {
-            console.error('Backend error:', backendResponse.status, backendResponse.statusText);
+            const errorText = await backendResponse.text();
+            console.error('Backend error:', backendResponse.status, errorText);
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: 'Backend search failed'
+                error: `Backend returned ${backendResponse.status}: ${errorText}`
             }, {
                 status: backendResponse.status
             });
         }
         const data = await backendResponse.json();
+        console.log('Backend response:', data);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json(data);
     } catch (error) {
         console.error('Search API error:', error);
