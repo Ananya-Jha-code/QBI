@@ -18,7 +18,7 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column' }} suppressHydrationWarning>
         <Navigation />
         <main style={{ flex: 1 }}>
           {children}
