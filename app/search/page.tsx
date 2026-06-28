@@ -3,166 +3,112 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { SearchInput } from '@/components/SearchInput';
+import ResultsCard from '@/components/ResultsCard';
 
-const MOCK_PROTEINS = [
-  { name: 'TP53', canonical: 'Tumor protein p53', results: 847, papers: 312 },
-  { name: 'EGFR', canonical: 'Epidermal growth factor receptor', results: 623, papers: 287 },
-  { name: 'BRCA1', canonical: 'Breast cancer type 1 susceptibility protein', results: 456, papers: 198 },
-  { name: 'AKT', canonical: 'RAC-alpha serine/threonine-protein kinase', results: 534, papers: 224 },
-  { name: 'ERK', canonical: 'Extracellular signal-regulated kinase 1/2', results: 412, papers: 176 },
-  { name: 'GAPDH', canonical: 'Glyceraldehyde 3-phosphate dehydrogenase', results: 1243, papers: 445 },
-];
-
-const MOCK_RESULTS = [
-  { id: 1, protein: 'TP53', cellLine: 'HeLa', result: 'upregulated', condition: 'Doxorubicin 1μM, 24h', paper: '34567890', year: 2023, confidence: 0.92 },
-  { id: 2, protein: 'TP53', cellLine: 'MCF-7', result: 'detected', condition: 'Untreated', paper: '34567891', year: 2023, confidence: 0.88 },
-  { id: 3, protein: 'TP53', cellLine: 'HCT116', result: 'upregulated', condition: '5-FU treatment', paper: '34567892', year: 2022, confidence: 0.94 },
+// Hardcoded results data
+const HARDCODED_RESULTS = [
+  {
+    id: 1,
+    model: 'mouse embryonic fibroblasts',
+    comparison: 'p53 WT vs knockout',
+    readout: 'phospho-TBK1',
+    control: 'total TBK1 / actin',
+    result: 'phosphorylation detected in WT, absent or reduced in KO',
+    experimentType: 'activity/PTM western',
+    paper: 'Smith et al. (2023)',
+    doi: '10.1038/s41586-023-06000-0',
+    confidence: 0.94,
+    figures: [
+      { url: 'https://images.unsplash.com/photo-1601884521474-46f369d821ce?w=600&h=400&fit=crop', caption: 'Figure 2A: Western blot analysis of phospho-TBK1 in p53 WT vs KO MEFs' },
+      { url: 'https://images.unsplash.com/photo-1611234185478-0058bdd6d5dd?w=600&h=400&fit=crop', caption: 'Figure 2B: Quantification of phospho-TBK1 levels' },
+      { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop', caption: 'Figure 2C: Loading control analysis' },
+    ],
+  },
+  {
+    id: 2,
+    model: 'HEK293T cells',
+    comparison: 'WT vs TBK1 knockout',
+    readout: 'phospho-IRF3',
+    control: 'total IRF3 / β-actin',
+    result: 'IRF3 phosphorylation abolished in KO',
+    experimentType: 'signaling western',
+    paper: 'Johnson et al. (2023)',
+    doi: '10.1038/s41467-023-40000-0',
+    confidence: 0.91,
+    figures: [
+      { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop', caption: 'Figure 3A: IRF3 phosphorylation in TBK1 WT vs KO' },
+    ],
+  },
+  {
+    id: 3,
+    model: 'primary mouse keratinocytes',
+    comparison: 'control vs LPS stimulation',
+    readout: 'phospho-p38',
+    control: 'total p38 / vinculin',
+    result: 'robust p38 phosphorylation upon LPS',
+    experimentType: 'kinase activation western',
+    paper: 'Chen et al. (2023)',
+    doi: '10.1126/science.aaw0129',
+    confidence: 0.88,
+    figures: [
+      { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop', caption: 'Figure 4: p38 phosphorylation timecourse' },
+      { url: 'https://images.unsplash.com/photo-1601884521474-46f369d821ce?w=600&h=400&fit=crop', caption: 'Figure S1: Replicate data' },
+    ],
+  },
 ];
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchedQuery, setSearchedQuery] = useState('');
+  const [showResults, setShowResults] = useState(false);
 
   const handleSearch = (searchQuery: string) => {
     setQuery(searchQuery);
-    
-    if (!searchQuery.trim()) {
-      setResults([]);
-      setSearchedQuery('');
-      return;
+    if (searchQuery.trim()) {
+      setShowResults(true);
     }
-
-    setLoading(true);
-    setSearchedQuery(searchQuery);
-
-    setTimeout(() => {
-      const filtered = MOCK_RESULTS.filter(r =>
-        r.protein.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setResults(filtered);
-      setLoading(false);
-    }, 300);
   };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '40px' }}>
       {/* Search Bar */}
-      <div style={{ padding: '40px 56px', borderBottom: '1px solid rgba(255,255,255,.07)', textAlign: 'center' }}>
-        <SearchInput placeholder="Search for a protein (e.g., TP53, EGFR, BRCA1)" onSearch={handleSearch} />
+      <div style={{ padding: '40px 56px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+        <SearchInput
+          placeholder="Search for a protein or experimental condition (e.g., 'Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.')"
+          onSearch={handleSearch}
+        />
       </div>
 
       {/* Results Section */}
-      <div style={{ padding: '60px 56px', maxWidth: '1200px', margin: '0 auto' }}>
-        {!searchedQuery ? (
+      <div style={{ padding: '60px 56px', maxWidth: '1000px', margin: '0 auto' }}>
+        {showResults ? (
           <div>
-            <h2 style={{ fontSize: '32px', fontWeight: 600, marginBottom: '40px' }}>Popular Proteins</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
-              {MOCK_PROTEINS.map((protein) => (
-                <div
-                  key={protein.name}
-                  className="vt-row"
-                  style={{
-                    padding: '24px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,.08)',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleSearch(protein.name)}
-                >
-                  <div style={{ fontSize: '18px', fontWeight: 600, color: '#4ad6b0', marginBottom: '8px' }}>
-                    {protein.name}
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#a9bdb5', marginBottom: '16px', lineHeight: 1.5 }}>
-                    {protein.canonical}
-                  </div>
-                  <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: '#6f857d' }}>
-                    <span>{protein.results} results</span>
-                    <span>•</span>
-                    <span>{protein.papers} papers</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : loading ? (
-          <div style={{ textAlign: 'center', paddingTop: '60px' }}>
-            <div style={{ fontSize: '16px', color: '#a9bdb5' }}>Searching for {searchedQuery}...</div>
-          </div>
-        ) : results.length > 0 ? (
-          <div>
+            {/* Results Header */}
             <div style={{ marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '32px', fontWeight: 600, marginBottom: '12px' }}>
-                {results.length} Results for "{searchedQuery}"
-              </h2>
-              <p style={{ color: '#a9bdb5' }}>
-                Found {results.length} western blot records across {new Set(results.map(r => r.paper)).size} papers
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
+                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
+                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
+                <span style={{ fontFamily: '"Newsreader", serif', fontSize: '20px', fontWeight: 400, color: '#e7f0ee' }}>Protein in Cell</span>
+              </div>
+              <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#a9bdb5', lineHeight: 1.6, marginTop: '12px' }}>
+                Showing {HARDCODED_RESULTS.length} hardcoded results for demonstration
               </p>
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,.08)' }}>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    CELL LINE
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    RESULT
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    CONDITION
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    PAPER
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    CONFIDENCE
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((result) => (
-                  <tr key={result.id} className="vt-row" style={{ borderBottom: '1px solid rgba(255,255,255,.04)' }}>
-                    <td style={{ padding: '14px 12px', fontSize: '14px', fontWeight: 500 }}>
-                      {result.cellLine}
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: '14px' }}>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '4px 10px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          background: result.result === 'upregulated' ? '#e0a458' : '#4ad6b0',
-                          color: '#04130f',
-                        }}
-                      >
-                        {result.result}
-                      </span>
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: '13px', color: '#a9bdb5' }}>
-                      {result.condition}
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: '13px' }}>
-                      <Link href={`https://pubmed.ncbi.nlm.nih.gov/${result.paper}`} target="_blank">
-                        <span style={{ color: '#4ad6b0', textDecoration: 'none', fontWeight: 500 }}>
-                          {result.paper}
-                        </span>
-                      </Link>
-                    </td>
-                    <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '13px', color: '#a9bdb5' }}>
-                      {(result.confidence * 100).toFixed(0)}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* Results Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {HARDCODED_RESULTS.map((result) => (
+                <ResultsCard key={result.id} data={result} />
+              ))}
+            </div>
           </div>
         ) : (
-          <div style={{ textAlign: 'center', paddingTop: '60px' }}>
-            <div style={{ fontSize: '16px', color: '#a9bdb5' }}>No results found for "{searchedQuery}"</div>
+          <div style={{ textAlign: 'center', paddingTop: '80px', color: '#a9bdb5' }}>
+            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '18px', lineHeight: 1.6 }}>
+              Enter a natural language query to search for western blot evidence
+            </p>
+            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', marginTop: '12px', color: '#6f857d' }}>
+              Example: "Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts."
+            </p>
           </div>
         )}
       </div>
