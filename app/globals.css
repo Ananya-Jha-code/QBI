@@ -100,6 +100,57 @@ body {
   transition: color 0.22s;
 }
 
+.typewriter-headline {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.typewriter-reserve {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.typewriter-visible {
+  position: absolute;
+  inset: 0 auto auto 0;
+  white-space: nowrap;
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 0.055em;
+  height: 0.78em;
+  margin-left: 0.08em;
+  border-radius: 999px;
+  background: #53e5d4;
+  transform: translateY(0.09em);
+  animation: typewriter-cursor-pulse 0.86s ease-in-out infinite;
+}
+
+.typewriter-cursor-done {
+  animation: typewriter-cursor-fade 0.8s ease 0.12s forwards;
+}
+
+@keyframes typewriter-cursor-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes typewriter-cursor-fade {
+  from {
+    opacity: 0.58;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
