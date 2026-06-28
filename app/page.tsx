@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-const TYPEWRITER_TEXT = 'Experiment-level evidence, searchable.';
+const TYPEWRITER_TEXT = 'Protein evidence, made searchable.';
 
 function TypewriterHeadline() {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -77,12 +77,6 @@ function TypewriterHeadline() {
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const EXAMPLE_QUERIES = [
-    'phospho-TBK1 in p53 WT vs KO MEFs',
-    'EGFR after erlotinib in A549 cells',
-    'BRCA1–BARD1 co-IP in human cells',
-  ];
-
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif", display: 'flex', flexDirection: 'column' }}>
       <section
@@ -134,29 +128,27 @@ export default function Home() {
           }}
         />
 
-        {/* Eyebrow */}
         <div
           style={{
             fontFamily: '"IBM Plex Mono", monospace',
             fontSize: 'clamp(9px, 1.5vw, 13px)',
             letterSpacing: 'clamp(3px, 0.5vw, 5px)',
             color: '#4ad6b0',
-            marginBottom: 'clamp(12px, 2vh, 24px)',
+            marginBottom: 'clamp(16px, 3vh, 32px)',
           }}
         >
-          FIGURE-LEVEL WESTERN BLOT EVIDENCE
+          PROTEIN&nbsp;DISCOVERY&nbsp;PLATFORM
         </div>
 
-        {/* Main Headlines */}
         <div style={{ marginBottom: 'clamp(16px, 4vh, 32px)', maxWidth: '95vw' }}>
           <h1
             style={{
               fontFamily: '"Newsreader", serif',
               fontWeight: 400,
-              fontSize: 'clamp(20px, 5vw, 52px)',
+              fontSize: 'clamp(26px, 6vw, 62px)',
               lineHeight: 1.2,
               letterSpacing: '-1.5px',
-              margin: '0 0 clamp(6px, 1.5vh, 12px) 0',
+              margin: '0 0 clamp(6px, 1.5vh, 16px) 0',
               color: '#e7f0ee',
             }}
           >
@@ -166,7 +158,7 @@ export default function Home() {
                 display: 'inline-block',
               }}
             >
-              Protein mentions, missing context
+              Manual review, buried evidence
               <span
                 aria-hidden="true"
                 style={{
@@ -198,22 +190,7 @@ export default function Home() {
           </h2>
         </div>
 
-        {/* Supporting Sentence */}
-        <div
-          style={{
-            maxWidth: '720px',
-            marginBottom: 'clamp(24px, 4vh, 40px)',
-            fontFamily: '"Newsreader", serif',
-            fontSize: 'clamp(14px, 2vw, 18px)',
-            color: '#a9bdb5',
-            lineHeight: 1.7,
-          }}
-        >
-          Search published western blots by readout, model, perturbation, and experiment type—then inspect the original figure, controls, caption, paper, and confidence behind every result.
-        </div>
-
-        {/* Search Bar */}
-        <div style={{ maxWidth: '750px', margin: '0 auto clamp(24px, 3vh, 36px)', width: '92vw' }}>
+        <div style={{ maxWidth: '750px', margin: 'clamp(16px, 3vh, 32px) auto clamp(12px, 2vh, 24px)', width: '92vw' }}>
           <div
             style={{
               display: 'flex',
@@ -241,15 +218,15 @@ export default function Home() {
             <span style={{ fontSize: 'clamp(16px, 2.2vw, 20px)', opacity: 0.8 }}>🔍</span>
             <input
               type="text"
-              placeholder="e.g. phospho-TBK1 · p53 WT vs KO · mouse embryonic fibroblasts"
+              placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
               value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 flex: 1,
                 background: 'transparent',
                 border: 'none',
                 color: '#e7f0ee',
-                fontSize: 'clamp(14px, 2vw, 18px)',
+                fontSize: 'clamp(12px, 1.8vw, 16px)',
                 fontFamily: "'Manrope', sans-serif",
                 outline: 'none',
               }}
@@ -284,107 +261,45 @@ export default function Home() {
               </button>
             )}
           </div>
-
-          {/* Example Query Chips */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 'clamp(8px, 1.5vw, 12px)',
-              marginTop: 'clamp(16px, 2vh, 24px)',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
-          >
-            {EXAMPLE_QUERIES.map((query, index) => (
-              <button
-                key={index}
-                onClick={() => setSearchQuery(query)}
-                style={{
-                  fontFamily: '"Newsreader", serif',
-                  fontSize: 'clamp(12px, 1.5vw, 14px)',
-                  color: '#a9bdb5',
-                  backgroundColor: 'rgba(74,214,176,.08)',
-                  border: '1px solid rgba(74,214,176,.2)',
-                  borderRadius: '20px',
-                  padding: 'clamp(8px, 1vh, 12px) clamp(12px, 1.5vw, 16px)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.15)';
-                  e.currentTarget.style.color = '#e7f0ee';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.08)';
-                  e.currentTarget.style.color = '#a9bdb5';
-                }}
-              >
-                {query}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* CTA Button */}
         <Link href="/search">
           <div
             className="vt-teal"
             style={{
               display: 'inline-flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 'clamp(8px, 1vh, 12px)',
-              height: 'auto',
+              height: 'clamp(36px, 4.5vh, 48px)',
               padding: '0 clamp(20px, 3.5vw, 36px)',
               borderRadius: 'clamp(18px, 1.8vw, 24px)',
               background: '#4ad6b0',
               color: '#04130f',
+              fontSize: 'clamp(11px, 1.5vw, 14px)',
               fontWeight: 700,
               fontFamily: '"IBM Plex Mono", monospace',
               letterSpacing: '0.5px',
               cursor: 'pointer',
               transition: 'all 0.3s',
-              marginTop: 'clamp(24px, 3vh, 40px)',
+              marginTop: 'clamp(8px, 1.5vh, 16px)',
             }}
           >
-            <div
-              style={{
-                fontSize: 'clamp(12px, 1.5vw, 16px)',
-                fontWeight: 700,
-                paddingTop: 'clamp(8px, 1.5vh, 12px)',
-                paddingBottom: 'clamp(4px, 0.8vh, 8px)',
-              }}
-            >
-              SEARCH WESTERN BLOT EVIDENCE
-            </div>
-            <div
-              style={{
-                fontSize: 'clamp(10px, 1.2vw, 12px)',
-                fontWeight: 500,
-                color: '#04130f',
-                opacity: 0.85,
-                paddingBottom: 'clamp(8px, 1.5vh, 12px)',
-              }}
-            >
-              Built for UCSF QBI Hackathon 2026
-            </div>
+            UCSF QBI 2026 Demo
           </div>
         </Link>
 
-        {/* Stats Section */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(40px, 6vh, 80px)', width: '100%', maxWidth: '90vw' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)' }}>12.4K+</div>
-            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>EVIDENCE RECORDS EXTRACTED</div>
+            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>BLOTS EXTRACTED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)' }}>2,800+</div>
-            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>SOURCE PAPERS INDEXED</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)' }}>2800+</div>
+            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PAPERS INDEXED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)' }}>520+</div>
-            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PROTEIN TARGETS COVERED</div>
+            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
           </div>
         </div>
       </section>
