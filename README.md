@@ -33,5 +33,5 @@ Backend: Python, FastAPI
 AI: Qwen 3-VL (hosted on RunPod), GPT 4.1
 
 
-## Run at: https://qbi.vercel.app
+## Run at: https://qbi-prod.vercel.app
 
