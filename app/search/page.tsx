@@ -1,168 +1,151 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SearchInput } from '@/components/SearchInput';
+import ResultsCard from '@/components/ResultsCard';
+import DatabaseResultCard from '@/components/DatabaseResultCard';
 
-const MOCK_PROTEINS = [
-  { name: 'TP53', canonical: 'Tumor protein p53', results: 847, papers: 312 },
-  { name: 'EGFR', canonical: 'Epidermal growth factor receptor', results: 623, papers: 287 },
-  { name: 'BRCA1', canonical: 'Breast cancer type 1 susceptibility protein', results: 456, papers: 198 },
-  { name: 'AKT', canonical: 'RAC-alpha serine/threonine-protein kinase', results: 534, papers: 224 },
-  { name: 'ERK', canonical: 'Extracellular signal-regulated kinase 1/2', results: 412, papers: 176 },
-  { name: 'GAPDH', canonical: 'Glyceraldehyde 3-phosphate dehydrogenase', results: 1243, papers: 445 },
-];
+interface DatabaseResult {
+  id: number;
+  paper_id: string;
+  page: number | null;
+  western_blot_type: string;
+  sample: string;
+  organism: string | null;
+  treatment_context: string | null;
+  figure_label: string | null;
+  target: string;
+  condition: string;
+  band_detected: boolean;
+  confidence: number | null;
+}
 
-const MOCK_RESULTS = [
-  { id: 1, protein: 'TP53', cellLine: 'HeLa', result: 'upregulated', condition: 'Doxorubicin 1μM, 24h', paper: '34567890', year: 2023, confidence: 0.92 },
-  { id: 2, protein: 'TP53', cellLine: 'MCF-7', result: 'detected', condition: 'Untreated', paper: '34567891', year: 2023, confidence: 0.88 },
-  { id: 3, protein: 'TP53', cellLine: 'HCT116', result: 'upregulated', condition: '5-FU treatment', paper: '34567892', year: 2022, confidence: 0.94 },
-];
+interface SearchResponse {
+  count: number;
+  results: DatabaseResult[];
+  question?: string;
+}
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [results, setResults] = useState<DatabaseResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchedQuery, setSearchedQuery] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = (searchQuery: string) => {
+  const handleSearch = async (searchQuery: string) => {
     setQuery(searchQuery);
-    
     if (!searchQuery.trim()) {
+      setShowResults(false);
       setResults([]);
-      setSearchedQuery('');
       return;
     }
 
     setLoading(true);
-    setSearchedQuery(searchQuery);
+    setError(null);
+    setShowResults(true);
 
-    setTimeout(() => {
-      const filtered = MOCK_RESULTS.filter(r =>
-        r.protein.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setResults(filtered);
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+
+      const data: SearchResponse = await response.json();
+      setResults(data.results || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      setResults([]);
+    } finally {
       setLoading(false);
-    }, 300);
+    }
   };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '40px' }}>
       {/* Search Bar */}
-      <div style={{ padding: '40px 56px', borderBottom: '1px solid rgba(255,255,255,.07)', textAlign: 'center' }}>
-        <SearchInput placeholder="Search for a protein (e.g., TP53, EGFR, BRCA1)" onSearch={handleSearch} />
+      <div style={{ padding: '40px 56px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+        <SearchInput
+          placeholder="Search for a protein or experimental condition (e.g., 'Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.')"
+          onSearch={handleSearch}
+        />
       </div>
 
       {/* Results Section */}
-      <div style={{ padding: '60px 56px', maxWidth: '1200px', margin: '0 auto' }}>
-        {!searchedQuery ? (
+      <div style={{ padding: '60px 56px', maxWidth: '1000px', margin: '0 auto' }}>
+        {showResults ? (
           <div>
-            <h2 style={{ fontSize: '32px', fontWeight: 600, marginBottom: '40px' }}>Popular Proteins</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
-              {MOCK_PROTEINS.map((protein) => (
-                <div
-                  key={protein.name}
-                  className="vt-row"
-                  style={{
-                    padding: '24px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,.08)',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleSearch(protein.name)}
-                >
-                  <div style={{ fontSize: '18px', fontWeight: 600, color: '#4ad6b0', marginBottom: '8px' }}>
-                    {protein.name}
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#a9bdb5', marginBottom: '16px', lineHeight: 1.5 }}>
-                    {protein.canonical}
-                  </div>
-                  <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: '#6f857d' }}>
-                    <span>{protein.results} results</span>
-                    <span>•</span>
-                    <span>{protein.papers} papers</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : loading ? (
-          <div style={{ textAlign: 'center', paddingTop: '60px' }}>
-            <div style={{ fontSize: '16px', color: '#a9bdb5' }}>Searching for {searchedQuery}...</div>
-          </div>
-        ) : results.length > 0 ? (
-          <div>
+            {/* Results Header */}
             <div style={{ marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '32px', fontWeight: 600, marginBottom: '12px' }}>
-                {results.length} Results for "{searchedQuery}"
-              </h2>
-              <p style={{ color: '#a9bdb5' }}>
-                Found {results.length} western blot records across {new Set(results.map(r => r.paper)).size} papers
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
+                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
+                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
+                <span style={{ fontFamily: '"Newsreader", serif', fontSize: '20px', fontWeight: 400, color: '#e7f0ee' }}>Western Blot Evidence</span>
+              </div>
+              <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#a9bdb5', lineHeight: 1.6, marginTop: '12px' }}>
+                {loading ? 'Searching database...' : `Found ${results.length} result${results.length !== 1 ? 's' : ''}`}
               </p>
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,.08)' }}>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    CELL LINE
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    RESULT
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    CONDITION
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    PAPER
-                  </th>
-                  <th style={{ padding: '12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace' }}>
-                    CONFIDENCE
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+            {/* Loading State */}
+            {loading && (
+              <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                <div style={{ fontFamily: '"Newsreader", serif', fontSize: '16px', color: '#a9bdb5' }}>
+                  Querying database...
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !loading && (
+              <div
+                style={{
+                  padding: '24px',
+                  backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                  border: '1px solid rgba(255, 107, 107, 0.3)',
+                  borderRadius: '8px',
+                  color: '#ff6b6b',
+                  fontFamily: '"Newsreader", serif',
+                  fontSize: '14px',
+                  marginBottom: '40px',
+                }}
+              >
+                Error: {error}
+              </div>
+            )}
+
+            {/* Results Cards */}
+            {!loading && results.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 {results.map((result) => (
-                  <tr key={result.id} className="vt-row" style={{ borderBottom: '1px solid rgba(255,255,255,.04)' }}>
-                    <td style={{ padding: '14px 12px', fontSize: '14px', fontWeight: 500 }}>
-                      {result.cellLine}
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: '14px' }}>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '4px 10px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          background: result.result === 'upregulated' ? '#e0a458' : '#4ad6b0',
-                          color: '#04130f',
-                        }}
-                      >
-                        {result.result}
-                      </span>
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: '13px', color: '#a9bdb5' }}>
-                      {result.condition}
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: '13px' }}>
-                      <Link href={`https://pubmed.ncbi.nlm.nih.gov/${result.paper}`} target="_blank">
-                        <span style={{ color: '#4ad6b0', textDecoration: 'none', fontWeight: 500 }}>
-                          {result.paper}
-                        </span>
-                      </Link>
-                    </td>
-                    <td style={{ padding: '14px 12px', textAlign: 'center', fontSize: '13px', color: '#a9bdb5' }}>
-                      {(result.confidence * 100).toFixed(0)}%
-                    </td>
-                  </tr>
+                  <DatabaseResultCard key={result.id} data={result} />
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
+
+            {/* No Results */}
+            {!loading && results.length === 0 && !error && (
+              <div style={{ textAlign: 'center', paddingTop: '40px', color: '#a9bdb5' }}>
+                <p style={{ fontFamily: '"Newsreader", serif', fontSize: '16px', lineHeight: 1.6 }}>
+                  No results found for your query.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', paddingTop: '60px' }}>
-            <div style={{ fontSize: '16px', color: '#a9bdb5' }}>No results found for "{searchedQuery}"</div>
+          <div style={{ textAlign: 'center', paddingTop: '80px', color: '#a9bdb5' }}>
+            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '18px', lineHeight: 1.6 }}>
+              Enter a natural language query to search for western blot evidence
+            </p>
+            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', marginTop: '12px', color: '#6f857d' }}>
+              Example: "Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts."
+            </p>
           </div>
         )}
       </div>
