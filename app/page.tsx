@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-const TYPEWRITER_TEXT = 'Protein evidence, made searchable.';
+const TYPEWRITER_TEXT = 'Experiment-level evidence, searchable.';
 
 function TypewriterHeadline() {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -128,6 +128,32 @@ export default function Home() {
           }}
         />
 
+        {/* Logo */}
+        <svg
+          width="clamp(40px, 6vw, 72px)"
+          height="clamp(40px, 6vw, 72px)"
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ marginBottom: 'clamp(16px, 2.5vh, 28px)' }}
+        >
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#4ad6b0" strokeWidth="1.5" />
+          <path
+            d="M 50 15 Q 65 25 70 40 Q 65 35 50 30 Q 35 25 30 40 Q 35 25 50 15"
+            fill="#4ad6b0"
+            opacity="0.8"
+          />
+          <path
+            d="M 50 50 Q 70 50 75 65 Q 70 58 50 55 Q 30 52 25 65 Q 30 50 50 50"
+            fill="#4ad6b0"
+            opacity="0.6"
+          />
+          <path
+            d="M 50 75 Q 60 80 65 90 Q 55 85 50 82 Q 45 79 35 90 Q 40 80 50 75"
+            fill="#4ad6b0"
+            opacity="0.4"
+          />
+        </svg>
+
         <div
           style={{
             fontFamily: '"IBM Plex Mono", monospace',
@@ -140,15 +166,29 @@ export default function Home() {
           PROTEIN&nbsp;DISCOVERY&nbsp;PLATFORM
         </div>
 
+        {/* Eyebrow */}
+        <div
+          style={{
+            fontFamily: '"IBM Plex Mono", monospace',
+            fontSize: 'clamp(9px, 1.2vw, 11px)',
+            letterSpacing: 'clamp(2px, 0.4vw, 3px)',
+            color: '#4ad6b0',
+            marginBottom: 'clamp(12px, 1.5vh, 20px)',
+            fontWeight: 600,
+          }}
+        >
+          FIGURE-LEVEL WESTERN BLOT EVIDENCE
+        </div>
+
         <div style={{ marginBottom: 'clamp(16px, 4vh, 32px)', maxWidth: '95vw' }}>
           <h1
             style={{
               fontFamily: '"Newsreader", serif',
               fontWeight: 400,
-              fontSize: 'clamp(26px, 6vw, 62px)',
+              fontSize: 'clamp(20px, 5vw, 52px)',
               lineHeight: 1.2,
               letterSpacing: '-1.5px',
-              margin: '0 0 clamp(6px, 1.5vh, 16px) 0',
+              margin: '0 0 clamp(6px, 1.5vh, 12px) 0',
               color: '#e7f0ee',
             }}
           >
@@ -158,7 +198,7 @@ export default function Home() {
                 display: 'inline-block',
               }}
             >
-              Manual review, buried evidence
+              Protein mentions, missing context
               <span
                 aria-hidden="true"
                 style={{
