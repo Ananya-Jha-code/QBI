@@ -4,17 +4,21 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const TYPEWRITER_TEXT = 'Experiment-level evidence, searchable.';
+const TYPEWRITER_START_DELAY_MS = 0;
+const TYPEWRITER_INITIAL_CHARS = 12;
+const TYPEWRITER_CHARS_PER_TICK = 1;
+const TYPEWRITER_TICK_MS = 14;
 
 function TypewriterHeadline() {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [showCursor, setShowCursor] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(TYPEWRITER_INITIAL_CHARS);
+  const [showCursor, setShowCursor] = useState(true);
   const [isCursorFading, setIsCursorFading] = useState(false);
 
   useEffect(() => {
     let typingTimeout: ReturnType<typeof setTimeout> | undefined;
     let cursorFadeTimeout: ReturnType<typeof setTimeout> | undefined;
     let cursorHideTimeout: ReturnType<typeof setTimeout> | undefined;
-    let currentIndex = 0;
+    let currentIndex = TYPEWRITER_INITIAL_CHARS;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setVisibleCount(TYPEWRITER_TEXT.length);
@@ -23,7 +27,7 @@ function TypewriterHeadline() {
     }
 
     const typeNextCharacter = () => {
-      currentIndex += 1;
+      currentIndex = Math.min(currentIndex + TYPEWRITER_CHARS_PER_TICK, TYPEWRITER_TEXT.length);
       setVisibleCount(currentIndex);
 
       if (currentIndex >= TYPEWRITER_TEXT.length) {
@@ -36,16 +40,14 @@ function TypewriterHeadline() {
         return;
       }
 
-      const currentCharacter = TYPEWRITER_TEXT[currentIndex - 1];
-      const nextDelay = currentCharacter === ',' ? 96 : currentCharacter === ' ' ? 34 : 52 + (currentIndex % 4) * 4;
-      typingTimeout = setTimeout(typeNextCharacter, nextDelay);
+      typingTimeout = setTimeout(typeNextCharacter, TYPEWRITER_TICK_MS);
     };
 
     const startTimeout = setTimeout(() => {
       setShowCursor(true);
       setIsCursorFading(false);
       typeNextCharacter();
-    }, 850);
+    }, TYPEWRITER_START_DELAY_MS);
 
     return () => {
       clearTimeout(startTimeout);
