@@ -88,6 +88,7 @@ The output directory contains:
 - `candidate_contexts.jsonl`
 - `summary.json`
 - `vlm_extractions.jsonl`, `vlm_extractions.json`
+- `vlm_failed_requests.jsonl` request-level VLM failure log
 - `vlm_extractions_positive_only.json`
 - `supabase_rows_streamed.jsonl`, `supabase_rows.json`
 - `vlm_summary.json`

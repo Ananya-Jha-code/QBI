@@ -5,9 +5,12 @@ CREATE TABLE IF NOT EXISTS western_blot_records (
     western_blot_type TEXT,
     sample TEXT,
     organism TEXT,
+    treatment_context TEXT,
+    figure_label TEXT,
     target TEXT,
     condition TEXT,
     band_detected BOOLEAN NOT NULL,
+    confidence DOUBLE PRECISION,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -18,4 +21,4 @@ CREATE INDEX IF NOT EXISTS idx_western_blot_records_sample
     ON western_blot_records (sample);
 
 CREATE UNIQUE INDEX IF NOT EXISTS uniq_western_blot_records_band
-    ON western_blot_records (paper_id, page, target, condition);
+    ON western_blot_records (paper_id, page, figure_label, target, condition);

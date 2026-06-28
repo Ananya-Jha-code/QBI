@@ -44,59 +44,127 @@ def flatten_json(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if extraction.get("is_western_blot") is not True:
             continue
 
-        sample = (
-            extraction.get("cell_line_tissue")
-            or extraction.get("biological_sample")
-            or extraction.get("sample_type")
-            or None
-        )
-        organism = extraction.get("organism") or None
-
-        lane_lookup = {
-            lane.get("lane_index"): lane.get("condition")
-            for lane in extraction.get("lanes_left_to_right", [])
-            if isinstance(lane, dict)
-        }
-        row_lookup = {
-            target.get("row_index"): target
-            for target in extraction.get("targets_top_to_bottom", [])
-            if isinstance(target, dict)
-        }
-        target_lookup = {
-            target.get("target"): target
-            for target in extraction.get("targets_top_to_bottom", [])
-            if isinstance(target, dict) and target.get("target")
-        }
-
-        for band in extraction.get("bands", []):
-            if not isinstance(band, dict):
-                continue
-
-            target = band.get("target")
-            row_index = band.get("row_index")
-            target_info = row_lookup.get(row_index) or target_lookup.get(target) or {}
-            if not target:
-                target = target_info.get("target")
-            if not target:
-                continue
-
-            rows.append(
-                {
-                    "paper_id": figure.get("paper_id"),
-                    "page": figure.get("page"),
-                    "western_blot_type": determine_blot_type(
-                        target,
-                        bool(target_info.get("is_loading_control", False)),
-                    ),
-                    "sample": sample,
-                    "organism": organism,
-                    "target": target,
-                    "condition": lane_lookup.get(band.get("lane_index")),
-                    "band_detected": band.get("band_state") == "present",
-                }
+        for panel in _iter_panel_extractions(extraction):
+            sample = (
+                panel.get("cell_line_tissue")
+                or panel.get("biological_sample")
+                or panel.get("sample_type")
+                or None
+            )
+            organism = panel.get("organism") or None
+            figure_label = _format_figure_label(
+                panel.get("figure_label"),
+                panel.get("panel_label"),
             )
 
+            lane_lookup = {
+                lane.get("lane_index"): lane.get("condition")
+                for lane in panel.get("lanes_left_to_right", [])
+                if isinstance(lane, dict)
+            }
+            row_lookup = {
+                target.get("row_index"): target
+                for target in panel.get("targets_top_to_bottom", [])
+                if isinstance(target, dict)
+            }
+            target_lookup = {
+                target.get("target"): target
+                for target in panel.get("targets_top_to_bottom", [])
+                if isinstance(target, dict) and target.get("target")
+            }
+
+            for band in panel.get("bands", []):
+                if not isinstance(band, dict):
+                    continue
+
+                target = band.get("target")
+                row_index = band.get("row_index")
+                target_info = row_lookup.get(row_index) or target_lookup.get(target) or {}
+                if not target:
+                    target = target_info.get("target")
+                if not target:
+                    continue
+
+                rows.append(
+                    {
+                        "paper_id": figure.get("paper_id"),
+                        "page": figure.get("page"),
+                        "western_blot_type": determine_blot_type(
+                            target,
+                            bool(target_info.get("is_loading_control", False)),
+                        ),
+                        "sample": sample,
+                        "organism": organism,
+                        "treatment_context": panel.get("treatment_context") or None,
+                        "figure_label": figure_label,
+                        "target": target,
+                        "condition": lane_lookup.get(band.get("lane_index")),
+                        "band_detected": band.get("band_state") == "present",
+                        "confidence": _confidence_value(
+                            band.get("confidence") or target_info.get("confidence")
+                        ),
+                    }
+                )
+
     return rows
+
+
+def _iter_panel_extractions(extraction: dict[str, Any]) -> list[dict[str, Any]]:
+    panels = extraction.get("panels")
+    if not isinstance(panels, list) or not panels:
+        return [extraction]
+
+    merged_panels = []
+    root_context = {
+        key: extraction.get(key)
+        for key in (
+            "figure_label",
+            "figure_caption",
+            "biological_sample",
+            "cell_line_tissue",
+            "organism",
+            "sample_type",
+            "treatment_context",
+        )
+    }
+    for panel in panels:
+        if not isinstance(panel, dict):
+            continue
+        merged = {
+            **root_context,
+            **{key: value for key, value in panel.items() if value not in (None, "")},
+        }
+        merged_panels.append(merged)
+    return merged_panels
+
+
+def _format_figure_label(figure_label: Any, panel_label: Any) -> str | None:
+    figure = str(figure_label).strip() if figure_label else ""
+    panel = str(panel_label).strip() if panel_label else ""
+    if figure and panel and not _ends_with_panel_label(figure, panel):
+        return f"{figure}{panel}"
+    return figure or panel or None
+
+
+def _ends_with_panel_label(figure_label: str, panel_label: str) -> bool:
+    figure = figure_label.strip()
+    panel = panel_label.strip()
+    if not figure.lower().endswith(panel.lower()):
+        return False
+    prefix = figure[: -len(panel)]
+    return not prefix or not prefix[-1].isalpha()
+
+
+def _confidence_value(confidence: Any) -> float | None:
+    if isinstance(confidence, (int, float)):
+        return float(confidence)
+    if not isinstance(confidence, str):
+        return None
+    return {
+        "high": 0.9,
+        "medium": 0.6,
+        "low": 0.3,
+    }.get(confidence.strip().lower())
 
 
 def upload_rows(

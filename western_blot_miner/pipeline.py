@@ -58,6 +58,7 @@ def run_pdf_pipeline(pdf_path: str | Path) -> dict:
         model=os.environ.get("WBM_VLM_MODEL", vlm_extract.DEFAULT_VLM_MODEL),
         max_tokens=_env_int("WBM_VLM_MAX_TOKENS", vlm_extract.DEFAULT_MAX_TOKENS),
         timeout=_env_int("WBM_VLM_TIMEOUT", vlm_extract.DEFAULT_TIMEOUT),
+        image_max_side=_env_int("WBM_VLM_IMAGE_MAX_SIDE", vlm_extract.DEFAULT_IMAGE_MAX_SIDE),
         resume=True,
         on_positive=upload_positive,
     )

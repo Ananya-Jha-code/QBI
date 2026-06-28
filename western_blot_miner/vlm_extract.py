@@ -9,6 +9,7 @@ import base64
 import io
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -18,6 +19,7 @@ from . import pdf_preprocess
 DEFAULT_VLM_MODEL = "Qwen/Qwen3-VL-8B-Instruct"
 DEFAULT_MAX_TOKENS = 8192
 DEFAULT_TIMEOUT = 300
+DEFAULT_IMAGE_MAX_SIDE = 1800
 
 PROMPT = """
 You are given ONE cropped candidate image from a scientific paper and paper text.
@@ -66,12 +68,51 @@ If it is a western blot/immunoblot/protein band panel, return:
   "warnings": []
 }
 
+If the crop contains multiple distinct blot panels or subpanels with different
+lane layouts, return one object per panel in "panels" instead of forcing them
+into one shared grid:
+{
+  "is_western_blot": true,
+  "figure_label": "",
+  "figure_caption": "",
+  "biological_sample": "",
+  "cell_line_tissue": "",
+  "organism": "",
+  "sample_type": "",
+  "treatment_context": "",
+  "panels": [
+    {
+      "panel_label": "E",
+      "panel_title": "",
+      "treatment_context": "",
+      "targets_top_to_bottom": [
+        {"row_index": 1, "target": "", "is_loading_control": false, "confidence": "low"}
+      ],
+      "lanes_left_to_right": [
+        {"lane_index": 1, "condition": "", "confidence": "low"}
+      ],
+      "bands": [
+        {"row_index": 1, "target": "", "lane_index": 1, "band_state": "present", "confidence": "low"}
+      ],
+      "warnings": []
+    }
+  ],
+  "warnings": []
+}
+
 Rules:
 - One band entry is required for every visible target row x every visible lane.
 - band_state must be "present", "absent", or "uncertain".
 - Use "uncertain" for faint, smeared, cropped, merged, or ambiguous bands.
 - Do not estimate fold change or intensity.
 - Read target names exactly as visible in the image.
+- For multi-panel crops, preserve each panel label and extract every visible
+  blot panel separately.
+- If the image is a partial split from a larger crop, extract every complete
+  visible blot panel and add a warning for rows, lane labels, or panels that
+  are visibly cut off.
+- Encode each lane condition with all visible time, dose, and treatment labels,
+  e.g. "48 h; LY3214996 0.2 umol/L; 1 h".
 - Loading controls include Actin, beta-actin, GAPDH, Tubulin, HSP90, Vinculin, and total protein.
 - If lane labels are shown as + / - grids, encode condition as readable text, e.g. "Drug +; siRNA -".
 """.strip()
@@ -112,6 +153,7 @@ class OpenAICompatibleVLM:
         api_key: str | None = None,
         model: str | None = None,
         timeout: int = DEFAULT_TIMEOUT,
+        image_max_side: int = DEFAULT_IMAGE_MAX_SIDE,
     ) -> None:
         self.base_url = (
             base_url
@@ -130,6 +172,7 @@ class OpenAICompatibleVLM:
             or DEFAULT_VLM_MODEL
         )
         self.timeout = timeout
+        self.image_max_side = image_max_side
 
         if not self.base_url:
             raise ValueError("VLM base URL is required via --vlm-base-url or WBM_VLM_BASE_URL")
@@ -155,7 +198,12 @@ class OpenAICompatibleVLM:
                     "content": [
                         {
                             "type": "image_url",
-                            "image_url": {"url": image_data_url(candidate_path)},
+                            "image_url": {
+                                "url": image_data_url(
+                                    candidate_path,
+                                    max_side=self.image_max_side,
+                                )
+                            },
                         },
                         {
                             "type": "text",
@@ -182,7 +230,7 @@ class OpenAICompatibleVLM:
         return parse_json(raw)
 
 
-def image_data_url(path: str | Path, max_side: int = 1200) -> str:
+def image_data_url(path: str | Path, max_side: int = DEFAULT_IMAGE_MAX_SIDE) -> str:
     """Return a resized crop as a PNG data URL."""
     img = pdf_preprocess.load_for_vlm(path, max_side=max_side)
     buffer = io.BytesIO()
@@ -198,6 +246,7 @@ def run_vlm_extraction(
     model: str | None = None,
     max_tokens: int = DEFAULT_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
+    image_max_side: int = DEFAULT_IMAGE_MAX_SIDE,
     limit: int | None = None,
     resume: bool = True,
     on_positive: Callable[[dict[str, Any]], int] | None = None,
@@ -209,29 +258,65 @@ def run_vlm_extraction(
     output_jsonl = run_dir / "vlm_extractions.jsonl"
     output_json = run_dir / "vlm_extractions.json"
     positives_json = run_dir / "vlm_extractions_positive_only.json"
+    failed_requests_jsonl = run_dir / "vlm_failed_requests.jsonl"
 
     candidates = json.loads(candidates_path.read_text(encoding="utf-8"))
     contexts = _read_contexts(contexts_path)
     if limit is not None:
         candidates = candidates[:limit]
+    if not resume and failed_requests_jsonl.exists():
+        failed_requests_jsonl.write_text("", encoding="utf-8")
 
     done_paths = set()
     results = []
     if resume and output_jsonl.exists():
+        existing_by_path = {}
         with output_jsonl.open(encoding="utf-8") as handle:
             for line in handle:
                 if not line.strip():
                     continue
                 record = json.loads(line)
-                results.append(record)
-                done_paths.add(record["candidate_path"])
+                existing_by_path[record["candidate_path"]] = record
+
+        for candidate in candidates:
+            record = existing_by_path.get(candidate["candidate_path"])
+            if not record:
+                continue
+            extraction = record.get("extraction")
+            if _should_retry_extraction(extraction):
+                continue
+            results.append(record)
+            done_paths.add(record["candidate_path"])
 
     extractor = OpenAICompatibleVLM(
         base_url=base_url,
         api_key=api_key,
         model=model,
         timeout=timeout,
+        image_max_side=image_max_side,
     )
+
+    def log_failure(
+        candidate_path: Path,
+        request_path: Path,
+        stage: str,
+        exc: Exception,
+    ) -> None:
+        _append_failed_request(
+            failed_requests_jsonl,
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "candidate_path": str(candidate_path),
+                "request_path": str(request_path),
+                "stage": stage,
+                "model": extractor.model,
+                "base_url": extractor.base_url,
+                "timeout": extractor.timeout,
+                "image_max_side": extractor.image_max_side,
+                "max_tokens": max_tokens,
+                **_exception_payload(exc),
+            },
+        )
 
     output_mode = "a" if resume else "w"
     streamed_positive_rows = 0
@@ -248,10 +333,12 @@ def run_vlm_extraction(
                 f"{candidate_path}"
             )
             try:
-                extraction = extractor.extract_candidate(
-                    candidate_path=candidate_path,
+                extraction = _extract_with_split_fallback(
+                    extractor=extractor,
+                    candidate_path=Path(candidate_path),
                     text_context=context,
                     max_tokens=max_tokens,
+                    log_failure=log_failure,
                 )
             except Exception as exc:
                 extraction = {
@@ -282,6 +369,7 @@ def run_vlm_extraction(
     summary = {
         "run_dir": str(run_dir),
         "model": extractor.model,
+        "image_max_side": extractor.image_max_side,
         "candidates": len(candidates),
         "results": len(results),
         "positive_results": len(positives),
@@ -289,9 +377,169 @@ def run_vlm_extraction(
         "output_jsonl": str(output_jsonl),
         "output_json": str(output_json),
         "positives_json": str(positives_json),
+        "failed_requests_jsonl": str(failed_requests_jsonl),
     }
     (run_dir / "vlm_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
+
+
+def _extract_with_split_fallback(
+    extractor: OpenAICompatibleVLM,
+    candidate_path: Path,
+    text_context: str,
+    max_tokens: int,
+    log_failure: Callable[[Path, Path, str, Exception], None] | None = None,
+) -> Any:
+    try:
+        return extractor.extract_candidate(
+            candidate_path=candidate_path,
+            text_context=text_context,
+            max_tokens=max_tokens,
+        )
+    except Exception as exc:
+        if log_failure is not None:
+            log_failure(candidate_path, candidate_path, "full", exc)
+        split_paths = _split_large_candidate(candidate_path)
+        if not split_paths:
+            raise
+
+        split_extractions = []
+        split_errors = [str(exc)]
+        for split_path in split_paths:
+            try:
+                split_extractions.append(
+                    extractor.extract_candidate(
+                        candidate_path=split_path,
+                        text_context=text_context,
+                        max_tokens=max_tokens,
+                    )
+                )
+            except Exception as split_exc:
+                if log_failure is not None:
+                    log_failure(candidate_path, split_path, "split", split_exc)
+                split_errors.append(str(split_exc))
+
+        merged = _merge_split_extractions(split_extractions)
+        if merged:
+            warnings = merged.setdefault("warnings", [])
+            warnings.append(
+                "Candidate image was split into smaller crops after the full crop request failed."
+            )
+            merged["split_candidate_paths"] = [str(path) for path in split_paths]
+            return merged
+
+        raise RuntimeError("; ".join(split_errors))
+
+
+def _split_large_candidate(candidate_path: Path) -> list[Path]:
+    try:
+        from PIL import Image
+    except ImportError:
+        return []
+
+    with Image.open(candidate_path) as img:
+        width, height = img.size
+        if height < 1200 or width < 900:
+            return []
+
+        split_dir = candidate_path.parent.parent / "vlm_panel_splits"
+        split_dir.mkdir(parents=True, exist_ok=True)
+        overlap = min(120, max(40, height // 14))
+        midpoint = height // 2
+        split_y = min(height - 200, max(200, midpoint + overlap))
+        boxes = [
+            (0, 0, width, split_y),
+            (0, split_y, width, height),
+        ]
+        paths = []
+        for idx, box in enumerate(boxes, 1):
+            split_path = split_dir / f"{candidate_path.stem}_part_{idx:02d}.png"
+            img.crop(box).save(split_path)
+            paths.append(split_path)
+        return paths
+
+
+def _merge_split_extractions(extractions: list[Any]) -> dict[str, Any] | None:
+    panels = []
+    root: dict[str, Any] = {
+        "is_western_blot": True,
+        "figure_label": "",
+        "figure_caption": "",
+        "biological_sample": "",
+        "cell_line_tissue": "",
+        "organism": "",
+        "sample_type": "",
+        "treatment_context": "",
+        "panels": panels,
+        "warnings": [],
+    }
+
+    for extraction in extractions:
+        if not isinstance(extraction, dict) or extraction.get("is_western_blot") is not True:
+            continue
+
+        for key in (
+            "figure_label",
+            "figure_caption",
+            "biological_sample",
+            "cell_line_tissue",
+            "organism",
+            "sample_type",
+            "treatment_context",
+        ):
+            if not root.get(key) and extraction.get(key):
+                root[key] = extraction[key]
+
+        if isinstance(extraction.get("warnings"), list):
+            root["warnings"].extend(extraction["warnings"])
+
+        split_panels = extraction.get("panels")
+        if isinstance(split_panels, list) and split_panels:
+            panels.extend(panel for panel in split_panels if isinstance(panel, dict))
+        else:
+            panel = {
+                key: value
+                for key, value in extraction.items()
+                if key
+                in {
+                    "panel_label",
+                    "panel_title",
+                    "treatment_context",
+                    "targets_top_to_bottom",
+                    "lanes_left_to_right",
+                    "bands",
+                    "warnings",
+                }
+            }
+            panels.append(panel)
+
+    return root if panels else None
+
+
+def _append_failed_request(path: Path, payload: dict[str, Any]) -> None:
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload) + "\n")
+
+
+def _exception_payload(exc: Exception) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "error_type": type(exc).__name__,
+        "error_message": str(exc),
+    }
+    response = getattr(exc, "response", None)
+    if response is not None:
+        payload["status_code"] = getattr(response, "status_code", None)
+        payload["response_url"] = getattr(response, "url", None)
+        text = getattr(response, "text", None)
+        if text:
+            payload["response_text"] = text[:1200]
+    return payload
+
+
+def _should_retry_extraction(extraction: Any) -> bool:
+    if not isinstance(extraction, dict):
+        return True
+    return extraction.get("error") in {"vlm_request_failed", "bad_json"}
 
 
 def _read_contexts(path: Path) -> dict[str, str]:
