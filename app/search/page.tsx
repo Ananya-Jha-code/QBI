@@ -73,9 +73,47 @@ export default function SearchPage() {
       {/* Search Bar */}
       <div style={{ padding: '40px 56px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
         <SearchInput
-          placeholder="Search for a protein or experimental condition (e.g., 'Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.')"
+          placeholder="Search by protein, modification, model, perturbation, or assay"
           onSearch={handleSearch}
         />
+
+        {/* Structured Query Display (when searching) */}
+        {showResults && query && (
+          <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+            <div>
+              <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', fontWeight: 600, color: '#6f857d', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                READOUT
+              </div>
+              <div style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#4ad6b0' }}>
+                phospho-TBK1
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', fontWeight: 600, color: '#6f857d', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                MODEL
+              </div>
+              <div style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#e7f0ee' }}>
+                mouse embryonic fibroblasts
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', fontWeight: 600, color: '#6f857d', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                COMPARISON
+              </div>
+              <div style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#e7f0ee' }}>
+                p53 WT vs KO
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', fontWeight: 600, color: '#6f857d', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                ASSAY
+              </div>
+              <div style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#e7f0ee' }}>
+                activity / PTM western
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Results Section */}
