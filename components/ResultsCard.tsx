@@ -35,38 +35,39 @@ export default function ResultsCard({ data }: ResultsCardProps) {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: expanded ? '1fr 280px' : '1fr 60px',
-        gap: '1px',
-        backgroundColor: 'rgba(255,255,255,.08)',
-        borderRadius: '8px',
+        gridTemplateColumns: expanded ? '1fr 240px' : '1fr 56px',
+        gap: '0',
+        backgroundColor: 'rgba(255,255,255,.07)',
+        borderRadius: '6px',
         overflow: 'hidden',
-        transition: 'all 0.3s ease',
+        transition: 'grid-template-columns 0.25s ease',
+        border: '1px solid rgba(255,255,255,.06)',
       }}
     >
       {/* Main Content Area */}
       <div
         style={{
           backgroundColor: '#06090c',
-          padding: '32px',
+          padding: '24px 28px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '24px',
+          gap: '20px',
         }}
       >
         {/* Content */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
           {/* Left Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* Model */}
             <div>
               <div
                 style={{
                   fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '11px',
+                  fontSize: '10px',
                   fontWeight: 600,
                   color: '#6f857d',
-                  marginBottom: '6px',
-                  letterSpacing: '0.5px',
+                  marginBottom: '4px',
+                  letterSpacing: '0.4px',
                 }}
               >
                 MODEL
@@ -74,9 +75,9 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               <div
                 style={{
                   fontFamily: '"Newsreader", serif',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   color: '#e7f0ee',
-                  lineHeight: 1.4,
+                  lineHeight: 1.3,
                 }}
               >
                 {data.model}
@@ -250,7 +251,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
           backgroundColor: '#0a0d0f',
           display: 'flex',
           flexDirection: 'column',
-          borderLeft: '1px solid rgba(255,255,255,.08)',
+          borderLeft: '1px solid rgba(255,255,255,.06)',
           cursor: 'pointer',
           overflow: 'hidden',
         }}
@@ -268,7 +269,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minHeight: '280px',
+                minHeight: '240px',
               }}
             >
               <img
@@ -283,16 +284,17 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             </div>
 
             {/* Navigation & Info */}
-            <div style={{ padding: '12px', borderTop: '1px solid rgba(255,255,255,.08)', backgroundColor: '#06090c' }}>
+            <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,.06)', backgroundColor: '#06090c' }}>
               {/* Figure Counter */}
               <div
                 style={{
                   fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '11px',
+                  fontSize: '9px',
                   fontWeight: 600,
                   color: '#4ad6b0',
-                  marginBottom: '8px',
+                  marginBottom: '6px',
                   textAlign: 'center',
+                  letterSpacing: '0.3px',
                 }}
               >
                 FIGURE {currentFigureIndex + 1} of {data.figures.length}
@@ -302,11 +304,11 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               <div
                 style={{
                   fontFamily: '"Newsreader", serif',
-                  fontSize: '12px',
+                  fontSize: '11px',
                   color: '#a9bdb5',
-                  lineHeight: 1.4,
-                  marginBottom: '12px',
-                  maxHeight: '60px',
+                  lineHeight: 1.3,
+                  marginBottom: '10px',
+                  maxHeight: '50px',
                   overflow: 'auto',
                 }}
               >
@@ -319,7 +321,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    gap: '8px',
+                    gap: '6px',
                   }}
                 >
                   <button
@@ -329,22 +331,22 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                     }}
                     style={{
                       flex: 1,
-                      backgroundColor: 'rgba(74,214,176,.15)',
-                      border: '1px solid rgba(74,214,176,.3)',
+                      backgroundColor: 'rgba(74,214,176,.12)',
+                      border: '1px solid rgba(74,214,176,.25)',
                       color: '#4ad6b0',
-                      padding: '6px',
-                      borderRadius: '4px',
+                      padding: '5px',
+                      borderRadius: '3px',
                       fontFamily: '"IBM Plex Mono", monospace',
-                      fontSize: '14px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
-                      transition: 'all 0.2s',
+                      transition: 'all 0.15s',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.3)';
+                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.25)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.15)';
+                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.12)';
                     }}
                   >
                     ←
@@ -356,22 +358,22 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                     }}
                     style={{
                       flex: 1,
-                      backgroundColor: 'rgba(74,214,176,.15)',
-                      border: '1px solid rgba(74,214,176,.3)',
+                      backgroundColor: 'rgba(74,214,176,.12)',
+                      border: '1px solid rgba(74,214,176,.25)',
                       color: '#4ad6b0',
-                      padding: '6px',
-                      borderRadius: '4px',
+                      padding: '5px',
+                      borderRadius: '3px',
                       fontFamily: '"IBM Plex Mono", monospace',
-                      fontSize: '14px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
-                      transition: 'all 0.2s',
+                      transition: 'all 0.15s',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.3)';
+                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.25)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.15)';
+                      e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.12)';
                     }}
                   >
                     →
@@ -382,18 +384,19 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               {/* DOI Link */}
               <div
                 style={{
-                  marginTop: '12px',
-                  paddingTop: '12px',
-                  borderTop: '1px solid rgba(255,255,255,.08)',
+                  marginTop: '8px',
+                  paddingTop: '8px',
+                  borderTop: '1px solid rgba(255,255,255,.06)',
                 }}
               >
                 <div
                   style={{
                     fontFamily: '"IBM Plex Mono", monospace',
-                    fontSize: '11px',
+                    fontSize: '9px',
                     fontWeight: 600,
                     color: '#6f857d',
-                    marginBottom: '6px',
+                    marginBottom: '4px',
+                    letterSpacing: '0.3px',
                   }}
                 >
                   DOI
@@ -404,10 +407,11 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   rel="noopener noreferrer"
                   style={{
                     fontFamily: '"IBM Plex Mono", monospace',
-                    fontSize: '11px',
+                    fontSize: '9px',
                     color: '#4ad6b0',
                     wordBreak: 'break-all',
                     textDecoration: 'none',
+                    lineHeight: 1.2,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.textDecoration = 'underline';
@@ -429,18 +433,18 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               alignItems: 'center',
               justifyContent: 'center',
               height: '100%',
-              padding: '12px',
+              padding: '8px',
             }}
           >
             <div
               style={{
                 fontFamily: '"IBM Plex Mono", monospace',
-                fontSize: '11px',
+                fontSize: '9px',
                 fontWeight: 600,
                 color: '#4ad6b0',
                 writingMode: 'vertical-rl',
                 textOrientation: 'mixed',
-                letterSpacing: '1px',
+                letterSpacing: '0.8px',
               }}
             >
               CITATION

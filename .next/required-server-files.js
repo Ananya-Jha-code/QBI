@@ -104,7 +104,7 @@ self.__SERVER_FILES_MANIFEST={
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/private/tmp/QBI",
+    "outputFileTracingRoot": "/Users/niks/Desktop/QBI",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -304,11 +304,11 @@ self.__SERVER_FILES_MANIFEST={
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "turbopack": {
-      "root": "/private/tmp/QBI"
+      "root": "/Users/niks/Desktop/QBI"
     },
     "distDirRoot": ".next"
   },
-  "appDir": "/private/tmp/QBI",
+  "appDir": "/Users/niks/Desktop/QBI",
   "relativeAppDir": "",
   "files": [
     ".next/package.json",
