@@ -195,69 +195,88 @@ export default function Home() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 'clamp(12px, 1.5vw, 16px)',
-              padding: 'clamp(14px, 2.2vh, 20px) clamp(20px, 2.5vw, 32px)',
-              background: 'rgba(255,255,255,.12)',
-              border: '1.5px solid rgba(255,255,255,.25)',
-              borderRadius: 'clamp(12px, 1.5vw, 16px)',
+              gap: '0px',
+              padding: '0px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '0px',
               transition: 'all 0.3s ease',
-              backdropFilter: 'blur(12px)',
-              boxShadow: '0 0 24px rgba(74,214,176,.2)',
-            }}
-            onMouseEnter={(event) => {
-              event.currentTarget.style.borderColor = 'rgba(74,214,176,.8)';
-              event.currentTarget.style.background = 'rgba(255,255,255,.15)';
-              event.currentTarget.style.boxShadow = '0 0 32px rgba(74,214,176,.35)';
-            }}
-            onMouseLeave={(event) => {
-              event.currentTarget.style.borderColor = 'rgba(255,255,255,.25)';
-              event.currentTarget.style.background = 'rgba(255,255,255,.12)';
-              event.currentTarget.style.boxShadow = '0 0 24px rgba(74,214,176,.2)';
+              backdropFilter: 'none',
+              boxShadow: 'none',
             }}
           >
-            <span style={{ fontSize: 'clamp(16px, 2.2vw, 20px)', opacity: 0.8 }}>🔍</span>
-            <input
-              type="text"
-              placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+            <div
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'clamp(12px, 1.5vw, 16px)',
+                padding: 'clamp(14px, 2.2vh, 20px) clamp(20px, 2.5vw, 32px)',
+                background: 'rgba(255,255,255,.12)',
+                border: '1.5px solid rgba(255,255,255,.25)',
+                borderRadius: 'clamp(12px, 1.5vw, 16px) 0 0 clamp(12px, 1.5vw, 16px)',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 0 24px rgba(74,214,176,.2)',
                 flex: 1,
-                background: 'transparent',
-                border: 'none',
-                color: '#e7f0ee',
-                fontSize: 'clamp(12px, 1.8vw, 16px)',
-                fontFamily: "'Manrope', sans-serif",
-                outline: 'none',
               }}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && searchQuery.trim()) {
-                  window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
-                }
+              onMouseEnter={(event) => {
+                event.currentTarget.style.borderColor = 'rgba(74,214,176,.8)';
+                event.currentTarget.style.background = 'rgba(255,255,255,.15)';
               }}
-            />
+              onMouseLeave={(event) => {
+                event.currentTarget.style.borderColor = 'rgba(255,255,255,.25)';
+                event.currentTarget.style.background = 'rgba(255,255,255,.12)';
+              }}
+            >
+              <span style={{ fontSize: 'clamp(16px, 2.2vw, 20px)', opacity: 0.8 }}>🔍</span>
+              <input
+                type="text"
+                placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#e7f0ee',
+                  fontSize: 'clamp(12px, 1.8vw, 16px)',
+                  fontFamily: "'Manrope', sans-serif",
+                  outline: 'none',
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && searchQuery.trim()) {
+                    window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+                  }
+                }}
+              />
+            </div>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
                 style={{
-                  background: 'rgba(74,214,176,.25)',
-                  border: 'none',
+                  background: 'rgba(255,255,255,.12)',
+                  border: '1.5px solid rgba(255,255,255,.25)',
+                  borderLeft: 'none',
                   color: '#e7f0ee',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
+                  borderRadius: '0 clamp(12px, 1.5vw, 16px) clamp(12px, 1.5vw, 16px) 0',
+                  padding: 'clamp(14px, 2.2vh, 20px) clamp(20px, 2.5vw, 32px)',
                   cursor: 'pointer',
-                  fontSize: '12px',
+                  fontSize: 'clamp(11px, 1.5vw, 13px)',
                   fontWeight: 600,
                   transition: 'all 0.2s',
+                  fontFamily: '"IBM Plex Mono", monospace',
+                  backdropFilter: 'blur(12px)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(74,214,176,.4)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,.15)';
+                  e.currentTarget.style.borderColor = 'rgba(74,214,176,.8)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(74,214,176,.25)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,.12)';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,.25)';
                 }}
               >
-                Clear
+                CLEAR
               </button>
             )}
           </div>
@@ -290,15 +309,15 @@ export default function Home() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)' }}>12.4K+</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>12.4K+</div>
             <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>BLOTS EXTRACTED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)' }}>2800+</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>2800+</div>
             <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PAPERS INDEXED</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)' }}>520+</div>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>520+</div>
             <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
           </div>
         </div>
