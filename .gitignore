@@ -1,3 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Secrets / local env
+.env
+*.env
+!*.env.example
+
+# Generated data (downloaded figures, SQLite DB)
+western_blot_miner/data/
+pdf_runs/
+
+# Claude Code / editor config
+.claude/
+
+# OS junk
+.DS_Store
+
 # Logs
 logs
 *.log
@@ -7,19 +30,20 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node / Next.js
+node_modules/
+.next/
+dist/
+dist-ssr/
 *.local
+.vercel/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-.vercel
