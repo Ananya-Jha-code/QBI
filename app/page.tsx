@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-const TYPEWRITER_TEXT = 'Experiment-level evidence, searchable.';
+const TYPEWRITER_TEXT = 'Protein evidence, made searchable.';
 
 function TypewriterHeadline() {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -178,7 +178,7 @@ export default function Home() {
                 display: 'inline-block',
               }}
             >
-              Protein mentions, missing context
+              Manual review, buried evidence
               <span
                 aria-hidden="true"
                 style={{
@@ -251,7 +251,7 @@ export default function Home() {
               <span style={{ fontSize: 'clamp(16px, 2.2vw, 20px)', opacity: 0.8 }}>🔍</span>
               <input
                 type="text"
-                placeholder="Search proteins (e.g., TP53, EGFR, BRCA1)"
+                placeholder="e.g. Show me all P53 western blots in A549 cells treated with Nutlin"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
@@ -302,7 +302,7 @@ export default function Home() {
           </div>
         </div>
 
-        <Link href="/search">
+        {/* <Link href="/search">
           <div
             className="vt-teal"
             style={{
@@ -325,9 +325,9 @@ export default function Home() {
           >
             UCSF QBI 2026 Demo
           </div>
-        </Link>
+        </Link> */}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
+          {/* <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>12.4K+</div>
               <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>BLOTS EXTRACTED</div>
@@ -340,7 +340,7 @@ export default function Home() {
               <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>520+</div>
               <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
     </div>
