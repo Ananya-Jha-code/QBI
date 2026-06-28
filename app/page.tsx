@@ -92,6 +92,7 @@ export default function Home() {
           overflow: 'hidden',
           isolation: 'isolate',
           background: '#06090c',
+          contain: 'layout style paint',
         }}
       >
         <video
@@ -100,7 +101,7 @@ export default function Home() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="none"
           poster="/images/hive.png"
           style={{
             position: 'absolute',
@@ -111,6 +112,7 @@ export default function Home() {
             objectPosition: 'center',
             zIndex: -2,
             pointerEvents: 'none',
+            contain: 'strict',
           }}
         >
           <source src="/videos/hive-background-v3.mp4" type="video/mp4" />
@@ -125,11 +127,15 @@ export default function Home() {
             background:
               'radial-gradient(circle at center, rgba(6,9,12,.38) 0%, rgba(6,9,12,.58) 46%, rgba(6,9,12,.84) 100%)',
             pointerEvents: 'none',
+            contain: 'strict',
+            willChange: 'opacity',
           }}
         />
 
-        {/* Logo */}
-        <svg
+        {/* Main Content */}
+        <div style={{ position: 'relative', zIndex: 1, contain: 'layout style' }}>
+          {/* Logo */}
+          <svg
           width="clamp(50px, 8vw, 88px)"
           height="clamp(50px, 8vw, 88px)"
           viewBox="0 0 935 941"
@@ -321,18 +327,19 @@ export default function Home() {
           </div>
         </Link>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>12.4K+</div>
-            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>BLOTS EXTRACTED</div>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>2800+</div>
-            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PAPERS INDEXED</div>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>520+</div>
-            <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(30px, 6vw, 80px)', marginTop: 'clamp(24px, 4vh, 48px)', width: '100%', maxWidth: '90vw' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#4ad6b0', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>12.4K+</div>
+              <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>BLOTS EXTRACTED</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#e0a458', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>2800+</div>
+              <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>PAPERS INDEXED</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'clamp(24px, 5vw, 44px)', fontWeight: 700, color: '#a78bfa', marginBottom: 'clamp(4px, 1vh, 8px)', fontFamily: '"IBM Plex Mono", monospace' }}>520+</div>
+              <div style={{ fontSize: 'clamp(10px, 1.5vw, 13px)', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: 'clamp(0.6px, 0.3vw, 1px)' }}>UNIQUE PROTEINS</div>
+            </div>
           </div>
         </div>
       </section>
